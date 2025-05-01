@@ -5,15 +5,10 @@ import timeit
 import os
 
 # phase codes based on environment.net.xml
-PHASE_NS_GREEN = 0  # action 0 code 00
-PHASE_NS_YELLOW = 1
-PHASE_NSL_GREEN = 2  # action 1 code 01
-PHASE_NSL_YELLOW = 3
-PHASE_EW_GREEN = 4  # action 2 code 10
-PHASE_EW_YELLOW = 5
-PHASE_EWL_GREEN = 6  # action 3 code 11
-PHASE_EWL_YELLOW = 7
-
+PHASE_NS_GREEN  = 0   # GGgrrrGGgrrr
+PHASE_NS_YELLOW = 1   # yyyrrryyyrrr
+PHASE_EW_GREEN  = 2   # rrrGGgrrrGGg
+PHASE_EW_YELLOW = 3   # rrryyyrrryyys
 
 class Simulation:
     def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_actions, training_epochs):
@@ -54,7 +49,7 @@ class Simulation:
         old_total_wait = 0
         old_state = -1
         old_action = -1
-
+        print("simulation started")
         while self._step < self._max_steps:
 
             # get current state of the intersection
@@ -68,19 +63,20 @@ class Simulation:
             # saving the data into the memory
             if self._step != 0:
                 self._Memory.add_sample((old_state, old_action, reward, current_state))
-
+            print("choosing action")
             # choose the light phase to activate, based on the current state of the intersection
             action = self._choose_action(current_state, epsilon)
-
+            print("after action")
             # if the chosen phase is different from the last phase, activate the yellow phase
             if self._step != 0 and old_action != action:
+                print("old action", old_action, "action", action)
                 self._set_yellow_phase(old_action)
                 self._simulate(self._yellow_duration)
-
+            print("after yellow phase")
             # execute the phase selected before
             self._set_green_phase(action)
             self._simulate(self._green_duration)
-
+            print("after green phase")
             # saving variables for later & accumulate reward
             old_state = current_state
             old_action = action
@@ -89,6 +85,7 @@ class Simulation:
             # saving only the meaningful reward to better see if the agent is behaving correctly
             if reward < 0:
                 self._sum_neg_reward += reward
+            print("iteration", self._step, "reward:", reward, "action:", action, "state:", current_state, "waiting time:", current_total_wait, "total waiting time:", old_total_wait)
 
         self._save_episode_stats()
         print("Total reward:", self._sum_neg_reward, "- Epsilon:", round(epsilon, 2))
@@ -152,7 +149,8 @@ class Simulation:
         """
         Activate the correct yellow light combination in sumo
         """
-        yellow_phase_code = old_action * 2 + 1 # obtain the yellow phase code, based on the old action (ref on environment.net.xml)
+        print("old action yellow", old_action)
+        yellow_phase_code = (old_action + 1 )%4# obtain the yellow phase code, based on the old action (ref on environment.net.xml)
         traci.trafficlight.setPhase("TL", yellow_phase_code)
 
 
@@ -160,14 +158,15 @@ class Simulation:
         """
         Activate the correct green light combination in sumo
         """
+        print("action number green", action_number)
         if action_number == 0:
             traci.trafficlight.setPhase("TL", PHASE_NS_GREEN)
-        elif action_number == 1:
-            traci.trafficlight.setPhase("TL", PHASE_NSL_GREEN)
         elif action_number == 2:
             traci.trafficlight.setPhase("TL", PHASE_EW_GREEN)
-        elif action_number == 3:
-            traci.trafficlight.setPhase("TL", PHASE_EWL_GREEN)
+        # elif action_number == 2:
+        #     traci.trafficlight.setPhase("TL", PHASE_EW_GREEN)
+        # elif action_number == 3:
+        #     traci.trafficlight.setPhase("TL", PHASE_EWL_GREEN)
 
 
     def _get_queue_length(self):
