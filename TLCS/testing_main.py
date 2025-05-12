@@ -53,3 +53,4 @@ if __name__ == "__main__":
 
     Visualization.save_data_and_plot(data=Simulation.reward_episode, filename='reward', xlabel='Action step', ylabel='Reward')
     Visualization.save_data_and_plot(data=Simulation.queue_length_episode, filename='queue', xlabel='Step', ylabel='Queue lenght (vehicles)')
+    print("resu;ts data",Simulation.reward_episode,Simulation.queue_length_episode)

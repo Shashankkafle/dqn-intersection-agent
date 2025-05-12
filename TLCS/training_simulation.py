@@ -4,10 +4,9 @@ import random
 import timeit
 import os
 
-# phase codes based on environment.net.xml
-PHASE_NS_GREEN  = 0   # GGgrrrGGgrrr
+PHASE_NS_GREEN  = 0   # GGgrrrGGgrrr action 0
 PHASE_NS_YELLOW = 1   # yyyrrryyyrrr
-PHASE_EW_GREEN  = 2   # rrrGGgrrrGGg
+PHASE_EW_GREEN  = 2   # rrrGGgrrrGGg action 1
 PHASE_EW_YELLOW = 3   # rrryyyrrryyys
 
 class Simulation:
@@ -38,7 +37,6 @@ class Simulation:
         # first, generate the route file for this simulation and set up sumo
         self._TrafficGen.generate_routefile(seed=episode)
         traci.start(self._sumo_cmd)
-        print("Simulating...")
 
         # inits
         self._step = 0
@@ -54,6 +52,7 @@ class Simulation:
 
             # get current state of the intersection
             current_state = self._get_state()
+            print("current state",current_state,type(current_state),len(current_state))
 
             # calculate reward of previous action: (change in cumulative waiting time between actions)
             # waiting time = seconds waited by a car since the spawn in the environment, cumulated for every car in incoming lanes
@@ -63,20 +62,15 @@ class Simulation:
             # saving the data into the memory
             if self._step != 0:
                 self._Memory.add_sample((old_state, old_action, reward, current_state))
-            print("choosing action")
             # choose the light phase to activate, based on the current state of the intersection
             action = self._choose_action(current_state, epsilon)
-            print("after action")
             # if the chosen phase is different from the last phase, activate the yellow phase
             if self._step != 0 and old_action != action:
-                print("old action", old_action, "action", action)
                 self._set_yellow_phase(old_action)
                 self._simulate(self._yellow_duration)
-            print("after yellow phase")
             # execute the phase selected before
             self._set_green_phase(action)
             self._simulate(self._green_duration)
-            print("after green phase")
             # saving variables for later & accumulate reward
             old_state = current_state
             old_action = action
@@ -85,14 +79,12 @@ class Simulation:
             # saving only the meaningful reward to better see if the agent is behaving correctly
             if reward < 0:
                 self._sum_neg_reward += reward
-            print("iteration", self._step, "reward:", reward, "action:", action, "state:", current_state, "waiting time:", current_total_wait, "total waiting time:", old_total_wait)
 
         self._save_episode_stats()
         print("Total reward:", self._sum_neg_reward, "- Epsilon:", round(epsilon, 2))
         traci.close()
         simulation_time = round(timeit.default_timer() - start_time, 1)
 
-        print("Training...")
         start_time = timeit.default_timer()
         for _ in range(self._training_epochs):
             self._replay()
@@ -149,8 +141,7 @@ class Simulation:
         """
         Activate the correct yellow light combination in sumo
         """
-        print("old action yellow", old_action)
-        yellow_phase_code = (old_action + 1 )%4# obtain the yellow phase code, based on the old action (ref on environment.net.xml)
+        yellow_phase_code = (old_action + 1 )%4 # obtain the yellow phase code, based on the old action (ref on environment.net.xml)
         traci.trafficlight.setPhase("TL", yellow_phase_code)
 
 
@@ -158,7 +149,6 @@ class Simulation:
         """
         Activate the correct green light combination in sumo
         """
-        print("action number green", action_number)
         if action_number == 0:
             traci.trafficlight.setPhase("TL", PHASE_NS_GREEN)
         elif action_number == 2:
@@ -192,6 +182,7 @@ class Simulation:
             lane_pos = traci.vehicle.getLanePosition(car_id)
             lane_id = traci.vehicle.getLaneID(car_id)
             lane_pos = 750 - lane_pos  # inversion of lane pos, so if the car is close to the traffic light -> lane_pos = 0 --- 750 = max len of a road
+            
 
             # distance in meters from the traffic light -> mapping into cells
             if lane_pos < 7:
@@ -214,24 +205,23 @@ class Simulation:
                 lane_cell = 8
             elif lane_pos <= 750:
                 lane_cell = 9
-
             # finding the lane where the car is located 
             # x2TL_3 are the "turn left only" lanes
-            if lane_id == "W2TL_0" or lane_id == "W2TL_1" or lane_id == "W2TL_2":
+            if lane_id == "W2TL_0":
                 lane_group = 0
-            elif lane_id == "W2TL_3":
+            elif lane_id == "W2TL_1":
                 lane_group = 1
-            elif lane_id == "N2TL_0" or lane_id == "N2TL_1" or lane_id == "N2TL_2":
+            elif lane_id == "N2TL_0":
                 lane_group = 2
-            elif lane_id == "N2TL_3":
+            elif lane_id == "N2TL_1":
                 lane_group = 3
-            elif lane_id == "E2TL_0" or lane_id == "E2TL_1" or lane_id == "E2TL_2":
+            elif lane_id == "E2TL_0":
                 lane_group = 4
-            elif lane_id == "E2TL_3":
+            elif lane_id == "E2TL_1":
                 lane_group = 5
-            elif lane_id == "S2TL_0" or lane_id == "S2TL_1" or lane_id == "S2TL_2":
+            elif lane_id == "S2TL_0":
                 lane_group = 6
-            elif lane_id == "S2TL_3":
+            elif lane_id == "S2TL_1":
                 lane_group = 7
             else:
                 lane_group = -1

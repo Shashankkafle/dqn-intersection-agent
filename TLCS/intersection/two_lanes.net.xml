@@ -80,28 +80,28 @@
     </edge>
 
     <edge id="TL2E" from="TL" to="J0" priority="-1">
-        <lane id="TL2E_0" index="0" speed="13.89" length="92.80" shape="-7.20,1.60 -100.00,1.60"/>
+        <lane id="TL2E_0" index="0" speed="13.89" length="800" shape="-7.20,1.60 -100.00,1.60"/>
     </edge>
     <edge id="TL2W" from="TL" to="J2" priority="-1">
-        <lane id="TL2W_0" index="0" speed="13.89" length="92.80" shape="7.20,-1.60 100.00,-1.60"/>
+        <lane id="TL2W_0" index="0" speed="13.89" length="800" shape="7.20,-1.60 100.00,-1.60"/>
     </edge>
     <edge id="N2TL" from="J3" to="TL" priority="-1">
-        <lane id="N2TL_0" index="0" speed="13.89" length="92.80" shape="-1.60,100.00 -1.60,7.20"/>
+        <lane id="N2TL_0" index="0" speed="13.89" length="800" shape="-1.60,100.00 -1.60,7.20"/>
     </edge>
     <edge id="S2TL" from="J4" to="TL" priority="-1">
-        <lane id="S2TL_0" index="0" speed="13.89" length="92.80" shape="1.60,-100.00 1.60,-7.20"/>
+        <lane id="S2TL_0" index="0" speed="13.89" length="800" shape="1.60,-100.00 1.60,-7.20"/>
     </edge>
     <edge id="E2TL" from="J0" to="TL" priority="-1">
-        <lane id="E2TL_0" index="0" speed="13.89" length="92.80" shape="-100.00,-1.60 -7.20,-1.60"/>
+        <lane id="E2TL_0" index="0" speed="13.89" length="800" shape="-100.00,-1.60 -7.20,-1.60"/>
     </edge>
     <edge id="W2TL" from="J2" to="TL" priority="-1">
-        <lane id="W2TL_0" index="0" speed="13.89" length="92.80" shape="100.00,1.60 7.20,1.60"/>
+        <lane id="W2TL_0" index="0" speed="13.89" length="800" shape="100.00,1.60 7.20,1.60"/>
     </edge>
     <edge id="TL2N" from="TL" to="J3" priority="-1">
-        <lane id="TL2N_0" index="0" speed="13.89" length="92.80" shape="1.60,7.20 1.60,100.00"/>
+        <lane id="TL2N_0" index="0" speed="13.89" length="800" shape="1.60,7.20 1.60,100.00"/>
     </edge>
     <edge id="TL2S" from="TL" to="J4" priority="-1">
-        <lane id="TL2S_0" index="0" speed="13.89" length="92.80" shape="-1.60,-7.20 -1.60,-100.00"/>
+        <lane id="TL2S_0" index="0" speed="13.89" length="800" shape="-1.60,-7.20 -1.60,-100.00"/>
     </edge>
 
     <tlLogic id="TL" type="static" programID="0" offset="0">
