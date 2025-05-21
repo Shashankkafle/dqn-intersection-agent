@@ -21,6 +21,9 @@ class Visualization:
         plt.xlabel(xlabel)
         plt.margins(0)
         plt.ylim(min_val - 0.05 * abs(min_val), max_val + 0.05 * abs(max_val))
+        
+        plt.grid(axis='y', linestyle='--', color='gray', alpha=0.7)
+
         fig = plt.gcf()
         fig.set_size_inches(20, 11.25)
         fig.savefig(os.path.join(self._path, 'plot_'+filename+'.png'), dpi=self._dpi)
