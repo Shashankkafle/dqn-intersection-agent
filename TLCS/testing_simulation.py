@@ -4,11 +4,14 @@ import random
 import timeit
 import os
 
-# phase codes based on environment.net.xml
-PHASE_NS_GREEN  = 0   # GGgrrrGGgrrr action 0
-PHASE_NS_YELLOW = 1   # yyyrrryyyrrr
-PHASE_EW_GREEN  = 2   # rrrGGgrrrGGg action 1
-PHASE_EW_YELLOW = 3   # rrryyyrrryyys
+PHASE_OPEN_N  = 0   # gGGgrrgrrgrr action 0
+PHASE_N_YELLOW = 1   # gyygrrgrrgrr
+PHASE_OPEN_W  = 2   # grrgGGgrrgrr action 1
+PHASE_W_YELLOW = 3   # grrgyygrrgrr
+PHASE_OPEN_S = 4 # grrgrrgGGgrr   action 2  
+PHASE_S_YELLOW = 5   #grrgrrgyygrr
+PHASE_OPEN_E = 6   #grrgrrgrrgGG  action 3
+PHASE_E_YELLOW = 7   #grrgrrgrrgyy
 
 
 class Simulation:
@@ -123,8 +126,8 @@ class Simulation:
         """
         Activate the correct yellow light combination in sumo
         """
-        print("old action yellow", old_action)
-        yellow_phase_code = (old_action + 1 )%4# obtain the yellow phase code, based on the old action (ref on environment.net.xml)
+        yellow_phase_code = (old_action *2 + 1 )%8 # obtain the yellow phase code, based on the old action (ref on environment.net.xml)
+        print("old action yellow yellow_phase_code", old_action,yellow_phase_code)
         traci.trafficlight.setPhase("TL", yellow_phase_code)
 
 
@@ -134,14 +137,13 @@ class Simulation:
         """
         print("action number green", action_number)
         if action_number == 0:
-            traci.trafficlight.setPhase("TL", PHASE_NS_GREEN)
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_N)
+        elif action_number == 1:
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_S)
         elif action_number == 2:
-            traci.trafficlight.setPhase("TL", PHASE_EW_GREEN)
-        # elif action_number == 2:
-        #     traci.trafficlight.setPhase("TL", PHASE_EW_GREEN)
-        # elif action_number == 3:
-        #     traci.trafficlight.setPhase("TL", PHASE_EWL_GREEN)
-
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_S)
+        elif action_number == 3:
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_E)
 
 
     def _get_queue_length(self):

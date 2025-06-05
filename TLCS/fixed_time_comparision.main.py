@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     config = import_test_configuration(config_file='testing_settings.ini')
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
-    model_path, plot_path = set_test_path(config['models_path_name'], config['model_to_test'])
+    model_path, plot_path, comaprision_path = set_test_path(config['models_path_name'], config['model_to_test'])
 
     Model = TestModel(
         input_dim=config['num_states'],
@@ -27,14 +27,11 @@ if __name__ == "__main__":
         config['n_cars_generated']
     )
 
-    Model_Visualization = Visualization(
-        "C:/Users/GIS2025/Q-learning/Deep-QLearning-Agent-for-Traffic-Signal-Control/TLCS/model_comparision", 
+    visualization = Visualization(
+       comaprision_path, 
         dpi=96
     )
-    Cyclic_Visualization = Visualization(
-        "C:/Users/GIS2025/Q-learning/Deep-QLearning-Agent-for-Traffic-Signal-Control/TLCS/cyclic_comparision", 
-        dpi=96
-    )
+
         
     Model_Simulation = Simulation(
         Model,
@@ -68,9 +65,9 @@ if __name__ == "__main__":
 
     copyfile(src='testing_settings.ini', dst=os.path.join(plot_path, 'testing_settings.ini'))
 
-    Model_Visualization.save_data_and_plot(data=Model_Simulation.reward_episode, filename='reward', xlabel='Action step', ylabel='Reward')
-    Model_Visualization.save_data_and_plot(data=Model_Simulation.queue_length_episode, filename='queue', xlabel='Step', ylabel='Queue lenght (vehicles)')
-    Model_Visualization.save_data_and_plot(data=Model_Simulation.avg_wait_episode, filename='average_wait', xlabel='Step', ylabel='Average wait (vehicles)')
-    Cyclic_Visualization.save_data_and_plot(data=Cyclic_Simulation.reward_episode, filename='reward', xlabel='Action step', ylabel='Reward')
-    Cyclic_Visualization.save_data_and_plot(data=Cyclic_Simulation.queue_length_episode, filename='queue', xlabel='Step', ylabel='Queue lenght (vehicles)')
-    Cyclic_Visualization.save_data_and_plot(data=Cyclic_Simulation.avg_wait_episode, filename='average_wait', xlabel='Step', ylabel='Average Wait (vehicles)')
+    visualization.save_data_and_plot(data=Model_Simulation.reward_episode, filename='model_reward', xlabel='Action step', ylabel='Reward')
+    visualization.save_data_and_plot(data=Model_Simulation.queue_length_episode, filename='model_queue', xlabel='Step', ylabel='Queue lenght (vehicles)')
+    visualization.save_data_and_plot(data=Model_Simulation.avg_wait_episode, filename='model_average_wait', xlabel='Step', ylabel='Average wait (vehicles)')
+    visualization.save_data_and_plot(data=Cyclic_Simulation.reward_episode, filename='fixed_time_reward', xlabel='Action step', ylabel='Reward')
+    visualization.save_data_and_plot(data=Cyclic_Simulation.queue_length_episode, filename='fixed_time_queue', xlabel='Step', ylabel='Queue lenght (vehicles)')
+    visualization.save_data_and_plot(data=Cyclic_Simulation.avg_wait_episode, filename='fixed_time_average_wait', xlabel='Step', ylabel='Average Wait (vehicles)')

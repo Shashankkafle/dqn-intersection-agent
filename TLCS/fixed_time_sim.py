@@ -4,11 +4,14 @@ import random
 import timeit
 import os
 
-# phase codes based on environment.net.xml
-PHASE_NS_GREEN  = 0   # GGgrrrGGgrrr action 0
-PHASE_NS_YELLOW = 1   # yyyrrryyyrrr
-PHASE_EW_GREEN  = 2   # rrrGGgrrrGGg action 1
-PHASE_EW_YELLOW = 3   # rrryyyrrryyys
+PHASE_OPEN_N  = 0   # gGGgrrgrrgrr action 0
+PHASE_N_YELLOW = 1   # gyygrrgrrgrr
+PHASE_OPEN_W  = 2   # grrgGGgrrgrr action 1
+PHASE_W_YELLOW = 3   # grrgyygrrgrr
+PHASE_OPEN_S = 4 # grrgrrgGGgrr   action 2  
+PHASE_S_YELLOW = 5   #grrgrrgyygrr
+PHASE_OPEN_E = 6   #grrgrrgrrgGG  action 3
+PHASE_E_YELLOW = 7   #grrgrrgrrgyy
 
 
 class Simulation:
@@ -35,7 +38,7 @@ class Simulation:
         start_time = timeit.default_timer()
 
         # first, generate the route file for this simulation and set up sumo
-        self._TrafficGen.generate_routefile(seed=episode)
+        # self._TrafficGen.generate_routefile(seed=episode)
         traci.start(self._sumo_cmd)
         print("Simulating...")
 
@@ -126,6 +129,7 @@ class Simulation:
         """
         Pick the best action known based on the current state of the env
         """
+        print("state in choose action", state)
         return np.argmax(self._Model.predict_one(state))
 
 
@@ -134,28 +138,26 @@ class Simulation:
         """
         Activate the correct yellow light combination in sumo
         """
-        if old_action == 0:
-            yellow_phase_code = PHASE_NS_YELLOW
-        elif old_action == 1:
-            yellow_phase_code = PHASE_EW_YELLOW
-        print("old action yellow,yellow_phase_code", old_action,yellow_phase_code)
-
+        yellow_phase_code = (old_action *2 + 1 )%8 # obtain the yellow phase code, based on the old action (ref on environment.net.xml)
+        print("yellow chosen old action, yellow phase code",old_action,yellow_phase_code)
         traci.trafficlight.setPhase("TL", yellow_phase_code)
+
 
 
     def _set_green_phase(self, action_number):
         """
         Activate the correct green light combination in sumo
         """
-        # print("action number green", action_number)
+        print("action number green", action_number)
         if action_number == 0:
-            traci.trafficlight.setPhase("TL", PHASE_NS_GREEN)
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_N)
         elif action_number == 1:
-            traci.trafficlight.setPhase("TL", PHASE_EW_GREEN)
-        # elif action_number == 2:
-        #     traci.trafficlight.setPhase("TL", PHASE_EW_GREEN)
-        # elif action_number == 3:
-        #     traci.trafficlight.setPhase("TL", PHASE_EWL_GREEN)
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_W)
+        elif action_number == 2:
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_S)
+        elif action_number == 3:
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_E)
+
 
 
 
@@ -207,21 +209,21 @@ class Simulation:
 
             # finding the lane where the car is located 
             # x2TL_3 are the "turn left only" lanes
-            if lane_id == "W2TL_0" or lane_id == "W2TL_1" or lane_id == "W2TL_2":
+            if lane_id == "W2TL_0":
                 lane_group = 0
-            elif lane_id == "W2TL_3":
+            elif lane_id == "TL2W_0":
                 lane_group = 1
-            elif lane_id == "N2TL_0" or lane_id == "N2TL_1" or lane_id == "N2TL_2":
+            elif lane_id == "N2TL_0":
                 lane_group = 2
-            elif lane_id == "N2TL_3":
+            elif lane_id == "TL2N_0":
                 lane_group = 3
-            elif lane_id == "E2TL_0" or lane_id == "E2TL_1" or lane_id == "E2TL_2":
+            elif lane_id == "E2TL_0":
                 lane_group = 4
-            elif lane_id == "E2TL_3":
+            elif lane_id == "TL2E_0":
                 lane_group = 5
-            elif lane_id == "S2TL_0" or lane_id == "S2TL_1" or lane_id == "S2TL_2":
+            elif lane_id == "S2TL_0":
                 lane_group = 6
-            elif lane_id == "S2TL_3":
+            elif lane_id == "TL2S_0":
                 lane_group = 7
             else:
                 lane_group = -1

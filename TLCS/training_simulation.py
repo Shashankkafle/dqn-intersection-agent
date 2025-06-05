@@ -4,10 +4,14 @@ import random
 import timeit
 import os
 
-PHASE_NS_GREEN  = 0   # GGgrrrGGgrrr action 0
-PHASE_NS_YELLOW = 1   # yyyrrryyyrrr
-PHASE_EW_GREEN  = 2   # rrrGGgrrrGGg action 1
-PHASE_EW_YELLOW = 3   # rrryyyrrryyys
+PHASE_OPEN_N  = 0   # gGGgrrgrrgrr action 0
+PHASE_N_YELLOW = 1   # gyygrrgrrgrr
+PHASE_OPEN_W  = 2   # grrgGGgrrgrr action 1
+PHASE_W_YELLOW = 3   # grrgyygrrgrr
+PHASE_OPEN_S = 4 # grrgrrgGGgrr   action 2  
+PHASE_S_YELLOW = 5   #grrgrrgyygrr
+PHASE_OPEN_E = 6   #grrgrrgrrgGG  action 3
+PHASE_E_YELLOW = 7   #grrgrrgrrgyy
 
 class Simulation:
     def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_actions, training_epochs):
@@ -47,18 +51,16 @@ class Simulation:
         old_total_wait = 0
         old_state = -1
         old_action = -1
-        print("simulation started")
         while self._step < self._max_steps:
 
             # get current state of the intersection
             current_state = self._get_state()
-            print("current state",current_state,type(current_state),len(current_state))
 
             # calculate reward of previous action: (change in cumulative waiting time between actions)
             # waiting time = seconds waited by a car since the spawn in the environment, cumulated for every car in incoming lanes
             current_total_wait = self._collect_waiting_times()
             reward = old_total_wait - current_total_wait
-
+            print("reward",reward)
             # saving the data into the memory
             if self._step != 0:
                 self._Memory.add_sample((old_state, old_action, reward, current_state))
@@ -141,7 +143,8 @@ class Simulation:
         """
         Activate the correct yellow light combination in sumo
         """
-        yellow_phase_code = (old_action + 1 )%4 # obtain the yellow phase code, based on the old action (ref on environment.net.xml)
+        yellow_phase_code = (old_action *2 + 1 )%8 # obtain the yellow phase code, based on the old action (ref on environment.net.xml)
+        print("yellow chosen old action, yellow phase code",old_action,yellow_phase_code)
         traci.trafficlight.setPhase("TL", yellow_phase_code)
 
 
@@ -149,14 +152,16 @@ class Simulation:
         """
         Activate the correct green light combination in sumo
         """
+        print("action number green", action_number)
         if action_number == 0:
-            traci.trafficlight.setPhase("TL", PHASE_NS_GREEN)
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_N)
+        elif action_number == 1:
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_W)
         elif action_number == 2:
-            traci.trafficlight.setPhase("TL", PHASE_EW_GREEN)
-        # elif action_number == 2:
-        #     traci.trafficlight.setPhase("TL", PHASE_EW_GREEN)
-        # elif action_number == 3:
-        #     traci.trafficlight.setPhase("TL", PHASE_EWL_GREEN)
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_S)
+        elif action_number == 3:
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_E)
+
 
 
     def _get_queue_length(self):
@@ -209,19 +214,19 @@ class Simulation:
             # x2TL_3 are the "turn left only" lanes
             if lane_id == "W2TL_0":
                 lane_group = 0
-            elif lane_id == "W2TL_1":
+            elif lane_id == "TL2W_0":
                 lane_group = 1
             elif lane_id == "N2TL_0":
                 lane_group = 2
-            elif lane_id == "N2TL_1":
+            elif lane_id == "TL2N_0":
                 lane_group = 3
             elif lane_id == "E2TL_0":
                 lane_group = 4
-            elif lane_id == "E2TL_1":
+            elif lane_id == "TL2E_0":
                 lane_group = 5
             elif lane_id == "S2TL_0":
                 lane_group = 6
-            elif lane_id == "S2TL_1":
+            elif lane_id == "TL2S_0":
                 lane_group = 7
             else:
                 lane_group = -1
