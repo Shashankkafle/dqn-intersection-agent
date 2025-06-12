@@ -13,7 +13,6 @@ PHASE_S_YELLOW = 5   #grrgrrgyygrr
 PHASE_OPEN_E = 6   #grrgrrgrrgGG  action 3
 PHASE_E_YELLOW = 7   #grrgrrgrrgyy
 
-
 class Simulation:
     def __init__(self, Model, TrafficGen, sumo_cmd, max_steps, green_duration, yellow_duration, num_states, num_actions, fixed_time=False):
         self._Model = Model
@@ -36,7 +35,7 @@ class Simulation:
         Runs the testing simulation
         """
         start_time = timeit.default_timer()
-
+        print("Running simulation for episode:", episode)
         # first, generate the route file for this simulation and set up sumo
         # self._TrafficGen.generate_routefile(seed=episode)
         traci.start(self._sumo_cmd)

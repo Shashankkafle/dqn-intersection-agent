@@ -57,8 +57,9 @@ if __name__ == "__main__":
     )
 
     print('\n----- Test episode')
-    simulation_time = Model_Simulation.run(config['episode_seed'])  # run the simulation
     simulation_time = Cyclic_Simulation.run(config['episode_seed'])  # run the simulation
+    simulation_time = Model_Simulation.run(config['episode_seed'])  # run the simulation
+
     print('Simulation time:', simulation_time, 's')
 
     print("----- Testing info saved at:", plot_path)

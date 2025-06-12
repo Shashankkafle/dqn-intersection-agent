@@ -105,24 +105,24 @@
     </edge>
 
     
-<!-- PHASE_OPEN_N  = 0   # gGGgrrgrrgrr action 0
-PHASE_N_YELLOW = 1   # gyygrrgrrgrr
-PHASE_OPEN_W  = 2   # grrgGGgrrgrr action 1
-PHASE_W_YELLOW = 3   # grrgyygrrgrr
-PHASE_OPEN_S = 4 # grrgrrgGGgrr   action 2  
-PHASE_S_YELLOW = 5   #grrgrrgyygrr
-PHASE_OPEN_E = 6   #grrgrrgrrgGG  action 3
-PHASE_E_YELLOW = 7   #grrgrrgrrgyy -->
+<!-- PHASE_OPEN_NS  = 0   # gGrgrrgGrgrr action 0
+PHASE_NS_YELLOW = 1   # gyrgrrgyrgrr
+PHASE_OPEN_EW  = 2   # grrgGrgrrgGr action 1
+PHASE_EW_YELLOW = 3   # grrgyrgrrgyr
+PHASE_OPEN_NWSE = 4 # grGgrrgrGgrr   action 2  
+PHASE_NWSE_YELLOW = 5   #grygrrgrygrr
+PHASE_OPEN_ENWS = 6   #grrgrGgrrgrG  action 3
+PHASE_ENWS_YELLOW = 7   #grrgrygrrgry -->
 
     <tlLogic id="TL" type="static" programID="0" offset="0">
-        <phase duration="100" state="gGGgrrgrrgrr"/>
-        <phase duration="100"  state="gyygrrgrrgrr"/>
-        <phase duration="100" state="grrgGGgrrgrr"/>
-        <phase duration="100"  state="grrgyygrrgrr"/>
-        <phase duration="100" state="grrgrrgGGgrr"/>
-        <phase duration="100"  state="grrgrrgyygrr"/>
-        <phase duration="100" state="grrgrrgrrgGG"/>
-        <phase duration="100"  state="grrgrrgrrgyy"/>
+        <phase duration="100" state="gGrgrrgGrgrr"/>
+        <phase duration="100"  state="gyrgrrgyrgrr"/>
+        <phase duration="100" state="grrgGrgrrgGr"/>
+        <phase duration="100"  state="grrgyrgrrgyr"/>
+        <phase duration="100" state="grGgrrgrGgrr"/>
+        <phase duration="100"  state="grygrrgrygrr"/>
+        <phase duration="100" state="grrgrGgrrgrG"/>
+        <phase duration="100"  state="grrgrygrrgry"/>
     </tlLogic>
 
 
