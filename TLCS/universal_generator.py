@@ -1,10 +1,12 @@
 import random
 import xml.etree.ElementTree as ET
 from sumolib.net import readNet
+from itertools import permutations, product
+
 
 # ---- CONFIG ----
 NET_FILE = "C:/Users/GIS2025/Q-learning/Deep-QLearning-Agent-for-Traffic-Signal-Control/TLCS/intersection/two_lanes.net.xml"
-OUTPUT_TRIPS_FILE = "intersection_trips.xml"
+OUTPUT_TRIPS_FILE = "OP_path"
 SIM_START = 0
 SIM_END = 3600  # in seconds
 VEHICLE_RATE = 1  # vehicles per second
@@ -48,21 +50,55 @@ def generate_trips(net, trip_rate=1.0):
         time += 1.0 / trip_rate
     return trips
 
-def write_trips(trips, output_file):
-    root = ET.Element("routes")
-    ET.SubElement(root, "vType", id=VEHICLE_TYPE, accel="2.6", decel="4.5", sigma="0.5", length="5", minGap="2.5", maxSpeed="50")
+def generate_routes(net):
+    """Generate all possible routes. NOTE: the junction with the traffic light must have id 'TL'."""
+    routes = []
+    edges = net.getEdges()
+    incomming_edges = []
+    outgoing_edges = []
+    for edge in edges:
+        from_node_id = edge.getFromNode().getID()
+        if from_node_id == "TL":
+            outgoing_edges.append(edge)
+        else:
+            incomming_edges.append(edge)
+    print(f"Incoming edges: {[edge.getID() for edge in incomming_edges]}")
+    print(f"Outgoing edges: {[edge.getID() for edge in outgoing_edges]}")
+    possible_routes = []
+    for edge_from in incomming_edges:
+        for edge_to in outgoing_edges:
+            # print(f"Checking route from {edge_from} to {edge_to}")
+            if edge_from.getFromNode().getID() == edge_to.getToNode().getID():
+                continue    
+            possible_routes.append((edge_from, edge_to))
+    print(f"Possible routes: {(possible_routes)}",len(possible_routes))
+    return possible_routes
 
-    for trip in trips:
-        ET.SubElement(root, "trip", id=trip["id"], depart=str(trip["depart"]), from_=trip["from"], to=trip["to"], type=VEHICLE_TYPE)
+
+def write_trips(trips, output_file,routes):
+    root = ET.Element("routes")
+    print("Writing trips to XML...")
+    for route in routes:
+        from_edge = route[0].getID()
+        to_edge = route[1].getID()
+        ET.SubElement(root, "route", id=f"route_{from_edge}_{to_edge}", edges=f"{from_edge} {to_edge}")
+    # ET.SubElement(root, "vType", id=VEHICLE_TYPE, accel="2.6", decel="4.5", sigma="0.5", length="5", minGap="2.5", maxSpeed="50")
+
+    # for trip in trips:
+    #     ET.SubElement(root, "trip", id=trip["id"], depart=str(trip["depart"]), from_=trip["from"], to=trip["to"], type=VEHICLE_TYPE)
 
     tree = ET.ElementTree(root)
+    print("element tree created",tree)
     tree.write(output_file, encoding="UTF-8", xml_declaration=True)
     print(f"✅ Trips written to {output_file}")
 
 def main():
+    print("Starting trip generation...")
     net = readNet(NET_FILE)
+    routes = generate_routes(net)
     trips = generate_trips(net, VEHICLE_RATE)
-    write_trips(trips, OUTPUT_TRIPS_FILE)
+    print("routes generated:", routes)
+    write_trips(trips, OUTPUT_TRIPS_FILE,routes)
 
 if __name__ == "__main__":
     main()
