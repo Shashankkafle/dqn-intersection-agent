@@ -3,7 +3,9 @@ import xml.etree.ElementTree as ET
 from sumolib.net import readNet
 from itertools import permutations, product
 from dotenv import load_dotenv
-import os
+import numpy as np
+import math
+
 
 
 
@@ -12,7 +14,7 @@ load_dotenv()
 class UniversalTrafficGenerator:
     """A class to generate traffic trips for SUMO based on a given network."""
 
-    def __init__(self, net_file, output_trips_file, sim_end=3600, vehicle_rate=1):
+    def __init__(self, net_file, output_trips_file, sim_end=3600, vehicle_rate=1,use_weibulll=True):
         self._net_file = net_file
         self._output_trips_file = output_trips_file
         self._sim_start = 0
@@ -25,6 +27,9 @@ class UniversalTrafficGenerator:
         self._ROUTE_IDS = []
         self._net = readNet(self._net_file)
         self._route_weights = []
+        self._use_weibull = use_weibulll
+        self._vehicle_count = int((sim_end-self._sim_start) * vehicle_rate)
+
     
 
     def _routeIdFromEdges(self,from_edge, to_edge):
@@ -33,8 +38,6 @@ class UniversalTrafficGenerator:
 
     def _generate_trips(self,seed):
         trips = []
-        trip_id = 0
-        time = self._sim_start
         print("self._ROUTE_IDS, self._ROUTE_IDS == []",self._ROUTE_IDS, self._ROUTE_IDS == [])
         print("self._sim_start,self._sim_end, self._vehicle_rate",self._sim_start,self._sim_end, self._vehicle_rate,((self._sim_end-self._sim_start) * self._vehicle_rate))
         if not self._ROUTE_IDS or self._ROUTE_IDS == []:
@@ -46,22 +49,42 @@ class UniversalTrafficGenerator:
                 self._route_weights.append(input_weight)
         
         random.seed(seed)
-        vehicle_Count = int((self._sim_end-self._sim_start) * self._vehicle_rate)
-        tripIDs = random.choices(self._ROUTE_IDS, weights= self._route_weights, k=vehicle_Count)
+        tripIDs = random.choices(self._ROUTE_IDS, weights= self._route_weights, k=self._vehicle_count)
         print("trip ids length",len(tripIDs))
-        time_increment = (self._sim_end - self._sim_start) / vehicle_Count
-        for time_count, route_id in enumerate(tripIDs):
+        time_increment = (self._sim_end - self._sim_start) / self._vehicle_count
+        if self._use_weibull:
+            depart_timings = self._generate_weibull_timings()
+        else:
+            # fixed increment per trip
+            depart_timings = [i * time_increment for i in range(len(tripIDs))]
+
+        for i, route_id in enumerate(tripIDs):
             trips.append({
                 "route": f"{str(route_id)}",
-                "depart": str(time_count * time_increment),
-                "id": f"trip_{time_count}",
+                "depart": depart_timings[i],
+                "id": f"trip_{i}",
             })
         return trips
 
+    def _generate_weibull_timings(self):
+         # the generation of cars is distributed according to a weibull distribution
+        timings = np.random.weibull(2, self._vehicle_count)
+        timings = np.sort(timings)
+
+        # reshape the distribution to fit the interval 0:max_steps
+        car_gen_steps = []
+        min_old = math.floor(timings[1])
+        max_old = math.ceil(timings[-1])
+        min_new = 0
+        max_new = self._max_steps
+        for value in timings:
+            car_gen_steps = np.append(car_gen_steps, ((max_new - min_new) / (max_old - min_old)) * (value - max_old) + max_new)
+
+        car_gen_steps = np.rint(car_gen_steps)
+        return car_gen_steps
 
     def _generate_routes(self):
         """Generate all possible routes. NOTE: the junction with the traffic light must have id 'TL'."""
-        routes = []
         edges = self._net.getEdges()
         for edge in edges:
             from_node_id = edge.getFromNode().getID()
