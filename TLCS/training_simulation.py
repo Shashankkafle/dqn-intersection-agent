@@ -4,14 +4,14 @@ import random
 import timeit
 import os
 
-PHASE_OPEN_NS  = 0   # gGrgrrgGrgrr action 0
-PHASE_NS_YELLOW = 1   # gyrgrrgyrgrr
-PHASE_OPEN_EW  = 2   # grrgGrGrgrrgG action 1
-PHASE_EW_YELLOW = 3   # grrgyryrgrrgy
-PHASE_OPEN_NWSE = 4  # grGgrrgrGgrr   action 2  
-PHASE_NWSE_YELLOW = 5   #grygrrgrygrr
-PHASE_OPEN_ENWS = 6   #grrgrGgrrgrG  action 3
-PHASE_ENWS_YELLOW = 7   #grrgrygrrgry
+PHASE_OPEN_N  = 0   # gGGGGgrrrrgrrrrgrrrr action 0
+PHASE_N_YELLOW = 1   # gyyyygrrrrgrrrrgrrrr
+PHASE_OPEN_E  = 2   # grrrrgGGGGgrrrrgrrrr action 1
+PHASE_E_YELLOW = 3   # grrrrgyyyygrrrrgrrrr
+PHASE_OPEN_S = 4  # grrrrgrrrrgGGGGgrrrr   action 2  
+PHASE_S_YELLOW = 5   #grrrrgrrrrgyyyygrrrr
+PHASE_OPEN_W = 6   #grrrrgrrrrgrrrrgGGGG  action 3
+PHASE_W_YELLOW = 7   #grrrrgrrrrgrrrrgyyyy
 
 class Simulation:
     def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_actions, training_epochs):
@@ -153,13 +153,13 @@ class Simulation:
         """
         # print("action number green", action_number)
         if action_number == 0:
-            traci.trafficlight.setPhase("TL", PHASE_OPEN_NS)
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_N)
         elif action_number == 1:
-            traci.trafficlight.setPhase("TL", PHASE_OPEN_EW)
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_E)
         elif action_number == 2:
-            traci.trafficlight.setPhase("TL", PHASE_OPEN_NWSE)
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_S)
         elif action_number == 3:
-            traci.trafficlight.setPhase("TL", PHASE_OPEN_ENWS)
+            traci.trafficlight.setPhase("TL", PHASE_OPEN_W)
 
 
 
