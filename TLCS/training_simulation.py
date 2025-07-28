@@ -143,7 +143,7 @@ class Simulation:
         Activate the correct yellow light combination in sumo
         """
         yellow_phase_code = (old_action *2 + 1 )%8 # obtain the yellow phase code, based on the old action (ref on environment.net.xml)
-        print("yellow chosen old action, yellow phase code",old_action,yellow_phase_code)
+        # print("yellow chosen old action, yellow phase code",old_action,yellow_phase_code)
         traci.trafficlight.setPhase("TL", yellow_phase_code)
 
 
@@ -151,7 +151,7 @@ class Simulation:
         """
         Activate the correct green light combination in sumo
         """
-        print("action number green", action_number)
+        # print("action number green", action_number)
         if action_number == 0:
             traci.trafficlight.setPhase("TL", PHASE_OPEN_NS)
         elif action_number == 1:
