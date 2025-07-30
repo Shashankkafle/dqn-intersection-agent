@@ -29,6 +29,7 @@ class UniversalTrafficGenerator:
         self._route_weights = []
         self._use_weibull = use_weibulll
         self._vehicle_count = int((sim_end-self._sim_start) * vehicle_rate)
+        self._max_steps = sim_end - self._sim_start
 
     
 
@@ -67,6 +68,7 @@ class UniversalTrafficGenerator:
         return trips
 
     def _generate_weibull_timings(self):
+        print("using weibull distribuion for arrival timings")
          # the generation of cars is distributed according to a weibull distribution
         timings = np.random.weibull(2, self._vehicle_count)
         timings = np.sort(timings)
@@ -103,6 +105,15 @@ class UniversalTrafficGenerator:
                 self._ROUTE_IDS.append(self._routeIdFromEdges(edge_from.getID(), edge_to.getID()))
         print(f"Possible routes: {(self._possible_routes)}",len(self._possible_routes))
 
+    def _sanitize_xml_tree(self,elem):
+        for child in elem.iter():
+            for key, value in child.attrib.items():
+                if isinstance(value, (np.floating, float)):
+                    child.set(key, str(float(value)))
+                elif isinstance(value, (np.integer, int)):
+                    child.set(key, str(int(value)))
+                else:
+                    child.set(key, str(value))
 
     def _write_trips(self,trips):
         root = ET.Element("routes")
@@ -118,6 +129,7 @@ class UniversalTrafficGenerator:
 
         tree = ET.ElementTree(root)
         print("element tree created",tree)
+        self._sanitize_xml_tree(tree.getroot())
         tree.write(self._output_trips_file, encoding="UTF-8", xml_declaration=True)
         print(f"✅ Trips written to {self._output_trips_file}")
     
