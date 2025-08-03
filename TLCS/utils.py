@@ -101,9 +101,12 @@ def set_test_path(models_path_name, model_n):
     """
     model_folder_path = os.path.join(os.getcwd(), models_path_name, 'model_'+str(model_n), '')
 
+   
     if os.path.isdir(model_folder_path):    
         plot_path = os.path.join(model_folder_path, 'test', '')
+        comparision_path = os.path.join(model_folder_path, 'test', 'comparision', '')
         os.makedirs(os.path.dirname(plot_path), exist_ok=True)
-        return model_folder_path, plot_path
+        os.makedirs(os.path.dirname(comparision_path), exist_ok=True)
+        return model_folder_path, plot_path, comparision_path
     else: 
         sys.exit('The model number specified does not exist in the models folder')
