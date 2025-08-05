@@ -11,6 +11,8 @@ from memory import Memory
 from model import TrainModel
 from visualization import Visualization
 from utils import import_train_configuration, set_sumo, set_train_path
+from universal_generator import UniversalTrafficGenerator
+
 
 
 if __name__ == "__main__":
@@ -33,9 +35,20 @@ if __name__ == "__main__":
         config['memory_size_min']
     )
 
-    TrafficGen = TrafficGenerator(
-        config['max_steps'], 
-        config['n_cars_generated']
+    # TrafficGen = TrafficGenerator(
+    #     config['max_steps'], 
+    #     config['n_cars_generated']
+    # )
+    flow_rate = config['n_cars_generated'] / config['max_steps']
+    NET_FILE = os.getenv("NET_FILE")
+    OUTPUT_TRIPS_FILE = os.getenv("OUTPUT_TRIPS_FILE")
+
+
+    TrafficGen = UniversalTrafficGenerator(
+        NET_FILE,
+        OUTPUT_TRIPS_FILE,
+        sim_end=config['max_steps'],
+        vehicle_rate=flow_rate
     )
 
     Visualization = Visualization(
