@@ -13,8 +13,9 @@ PHASE_S_YELLOW = 5   #grrgrrgyygrr
 PHASE_OPEN_E = 6   #grrgrrgrrgGG  action 3
 PHASE_E_YELLOW = 7   #grrgrrgrrgyy
 
+# Make shre to map the phase duration to actions
 class Simulation:
-    def __init__(self, Model, TrafficGen, sumo_cmd, max_steps, green_duration, yellow_duration, num_states, num_actions, fixed_time=False):
+    def __init__(self, Model, TrafficGen, sumo_cmd, max_steps, green_duration, yellow_duration, num_states, num_actions, fixed_time=False, phase_durations=None):
         self._Model = Model
         self._TrafficGen = TrafficGen
         self._step = 0
@@ -28,6 +29,7 @@ class Simulation:
         self._avg_wait_episode = []
         self._queue_length_episode = []
         self._fixed_time = fixed_time  # Flag to indicate if fixed time simulation is used
+        self._phase_durations =phase_durations
 
 
     def run(self, episode):
@@ -73,7 +75,13 @@ class Simulation:
 
             # execute the phase selected before
             self._set_green_phase(action)
-            self._simulate(self._green_duration)
+            if self._fixed_time:
+                if self._phase_durations is None:
+                    raise Exception("Phase durations must be provided for fixed tims simulations")
+                sim_duration = self._phase_durations[action]
+            else:
+                sim_duration = self._green_duration
+            self._simulate(sim_duration)
 
             # saving variables for later & accumulate reward
             old_action = action
@@ -208,21 +216,21 @@ class Simulation:
 
             # finding the lane where the car is located 
             # x2TL_3 are the "turn left only" lanes
-            if lane_id == "W2TL_0":
+            if lane_id == "W2TL_0" or lane_id == "W2TL_1" or lane_id == "W2TL_2":
                 lane_group = 0
-            elif lane_id == "TL2W_0":
+            elif lane_id == "W2TL_3":
                 lane_group = 1
-            elif lane_id == "N2TL_0":
+            elif lane_id == "N2TL_0" or lane_id == "N2TL_1" or lane_id == "N2TL_2":
                 lane_group = 2
-            elif lane_id == "TL2N_0":
+            elif lane_id == "N2TL_3":
                 lane_group = 3
-            elif lane_id == "E2TL_0":
+            elif lane_id == "E2TL_0" or lane_id == "E2TL_1" or lane_id == "E2TL_2":
                 lane_group = 4
-            elif lane_id == "TL2E_0":
+            elif lane_id == "E2TL_3":
                 lane_group = 5
-            elif lane_id == "S2TL_0":
+            elif lane_id == "S2TL_0" or lane_id == "S2TL_1" or lane_id == "S2TL_2":
                 lane_group = 6
-            elif lane_id == "TL2S_0":
+            elif lane_id == "S2TL_3":
                 lane_group = 7
             else:
                 lane_group = -1
