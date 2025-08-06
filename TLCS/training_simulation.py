@@ -211,21 +211,21 @@ class Simulation:
                 lane_cell = 9
             # finding the lane where the car is located 
             # x2TL_3 are the "turn left only" lanes
-            if lane_id == "W2TL_0":
+            if lane_id == "W2TL_0" or lane_id == "W2TL_1" or lane_id == "W2TL_2":
                 lane_group = 0
-            elif lane_id == "TL2W_0":
+            elif lane_id == "W2TL_3":
                 lane_group = 1
-            elif lane_id == "N2TL_0":
+            elif lane_id == "N2TL_0" or lane_id == "N2TL_1" or lane_id == "N2TL_2":
                 lane_group = 2
-            elif lane_id == "TL2N_0":
+            elif lane_id == "N2TL_3":
                 lane_group = 3
-            elif lane_id == "E2TL_0":
+            elif lane_id == "E2TL_0" or lane_id == "E2TL_1" or lane_id == "E2TL_2":
                 lane_group = 4
-            elif lane_id == "TL2E_0":
+            elif lane_id == "E2TL_3":
                 lane_group = 5
-            elif lane_id == "S2TL_0":
+            elif lane_id == "S2TL_0" or lane_id == "S2TL_1" or lane_id == "S2TL_2":
                 lane_group = 6
-            elif lane_id == "TL2S_0":
+            elif lane_id == "S2TL_3":
                 lane_group = 7
             else:
                 lane_group = -1
