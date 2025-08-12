@@ -14,12 +14,11 @@ load_dotenv()
 class UniversalTrafficGenerator:
     """A class to generate traffic trips for SUMO based on a given network."""
 
-    def __init__(self, net_file, output_trips_file, sim_end=3600, vehicle_rate=1,use_weibulll=True):
+    def __init__(self, net_file, output_trips_file,vehicle_count, sim_end=3600 ,use_weibulll=True):
         self._net_file = net_file
         self._output_trips_file = output_trips_file
         self._sim_start = 0
         self._sim_end = sim_end
-        self._vehicle_rate = vehicle_rate
         self._VEHICLE_TYPE = "car"
         self._possible_routes = []
         self._incomming_edges = []
@@ -28,7 +27,7 @@ class UniversalTrafficGenerator:
         self._net = readNet(self._net_file)
         self._route_weights = []
         self._use_weibull = use_weibulll
-        self._vehicle_count = int((sim_end-self._sim_start) * vehicle_rate)
+        self._vehicle_count = vehicle_count
         self._max_steps = sim_end - self._sim_start
 
     
@@ -40,7 +39,6 @@ class UniversalTrafficGenerator:
     def _generate_trips(self,seed):
         trips = []
         print("self._ROUTE_IDS, self._ROUTE_IDS == []",self._ROUTE_IDS, self._ROUTE_IDS == [])
-        print("self._sim_start,self._sim_end, self._vehicle_rate",self._sim_start,self._sim_end, self._vehicle_rate,((self._sim_end-self._sim_start) * self._vehicle_rate))
         if not self._ROUTE_IDS or self._ROUTE_IDS == []:
             print("Generating routes...")
             self._generate_routes()
@@ -51,7 +49,7 @@ class UniversalTrafficGenerator:
         
         random.seed(seed)
         tripIDs = random.choices(self._ROUTE_IDS, weights= self._route_weights, k=self._vehicle_count)
-        print("trip ids length",len(tripIDs))
+        print("trip ids length",len(tripIDs),self._vehicle_count)
         time_increment = (self._sim_end - self._sim_start) / self._vehicle_count
         if self._use_weibull:
             depart_timings = self._generate_weibull_timings()
