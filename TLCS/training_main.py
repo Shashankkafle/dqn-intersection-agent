@@ -48,7 +48,7 @@ if __name__ == "__main__":
         NET_FILE,
         OUTPUT_TRIPS_FILE,
         sim_end=config['max_steps'],
-        vehicle_rate=flow_rate
+        vehicle_count= config['n_cars_generated'] 
     )
 
     Visualization = Visualization(
