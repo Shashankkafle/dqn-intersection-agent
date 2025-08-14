@@ -15,7 +15,6 @@ TrafficGen = UniversalTrafficGenerator(
     sim_end=config['max_steps'],
     vehicle_count=config['n_cars_generated']
 )
-for i in range(10):
-    print("Generating route file for seed", i)
-    TrafficGen.generate_routefile(seed=i)
-    fixed_durations = get_durations(output_trips_file, config['max_steps'])
+
+TrafficGen.generate_routefile(seed=0)
+fixed_durations = get_durations(output_trips_file, config['max_steps'])

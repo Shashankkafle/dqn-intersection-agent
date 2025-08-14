@@ -116,12 +116,8 @@ def get_durations(route_file,max_steps):
                 raise Exception(f"Critical lane {critical_lane} not found in flow ratios.")
             
         print("phase to green duration", phase_to_green_duration)
-            
-        # Assuming fixed durations for green and yellow lights
-        green_duration = 30  # seconds
-        yellow_duration = 5  # seconds
         
-        return  green_duration, yellow_duration
+        return  phase_to_green_duration
 # route_file = os.getenv("OUTPUT_TRIPS_FILE")
 # max_steps = 5400  # Example max steps, adjust as needed
 # get_durations(route_file, max_steps)
