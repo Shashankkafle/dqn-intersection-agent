@@ -11,21 +11,22 @@ S=1800  # Saturation flow rate  = 3600/headway assuming 2 seconds headway
 # PHASE_NSL_GREEN  
 # PHASE_EW_GREEN 
 # PHASE_EWL_GREEN 
+# CAUTION: Make sure the lane group names amteh the routes name in the route file
 lane_group_to_phase = {
-"W_E": "PHASE_EW_GREEN",
-"E_W": "PHASE_EW_GREEN",
-"N_S": "PHASE_NS_GREEN",
-"S_N": "PHASE_NS_GREEN",
-"E_S": "PHASE_EWL_GREEN",
-"W_N": "PHASE_EWL_GREEN",
-"S_E": "PHASE_NSL_GREEN",
-"N_W": "PHASE_NSL_GREEN",
+"route_W2TL_TL2E": "PHASE_EW_GREEN",
+"route_E2TL_TL2W": "PHASE_EW_GREEN",
+"route_N2TL_TL2S": "PHASE_NS_GREEN",
+"route_S2TL_TL2N": "PHASE_NS_GREEN",
+"route_E2TL_TL2S": "PHASE_EWL_GREEN",
+"route_W2TL_TL2N": "PHASE_EWL_GREEN",
+"route_S2TL_TL2E": "PHASE_NSL_GREEN",
+"route_N2TL_TL2W": "PHASE_NSL_GREEN",
 }
 phase_to_lane_group = {
-    "PHASE_NS_GREEN": ["N_S", "S_N"],
-    "PHASE_NSL_GREEN": ["N_W", "S_E"],
-    "PHASE_EW_GREEN": ["W_E", "E_W"],
-    "PHASE_EWL_GREEN": ["E_S", "W_N"]
+    "PHASE_NS_GREEN": ["route_N2TL_TL2S", "route_S2TL_TL2N"],
+    "PHASE_NSL_GREEN": ["route_N2TL_TL2W", "route_S2TL_TL2E"],
+    "PHASE_EW_GREEN": ["route_W2TL_TL2E", "route_E2TL_TL2W"],
+    "PHASE_EWL_GREEN": ["route_E2TL_TL2S", "route_W2TL_TL2N"]
 }
 load_dotenv(override=True)
 def get_analysis_flow():
@@ -42,7 +43,6 @@ def get_durations(route_file,max_steps):
         if not route_file or not os.path.exists(route_file):
             print(f"Route file {route_file} does not exist.")
             raise FileNotFoundError(f"Route file {route_file} does not exist.")
-        
         routes = sumolib.xml.parse(route_file, "vehicle")
 
         lane_group_counts = {}
@@ -54,12 +54,16 @@ def get_durations(route_file,max_steps):
                 lane_group_counts[route_id] = 1
         lane_group_flow = {}
         lane_group_to_flow_ratio = {}
-
+        print("Simulation hours:", simulation_hours)
         print("vehicle counts")
         for lane_group, count in lane_group_counts.items():
             print(f"{lane_group}: {count} vehicles")
             lane_group_flow[lane_group] = (count/simulation_hours) / PHF 
             lane_group_to_flow_ratio[lane_group] = lane_group_flow[lane_group] / S
+
+        print("Analysis flow rates")
+        for lane_group, ratio in lane_group_flow.items():
+            print(f"{lane_group}: {ratio} ")
 
         print("flow ratios")
         for lane_group, ratio in lane_group_to_flow_ratio.items():
@@ -118,6 +122,6 @@ def get_durations(route_file,max_steps):
         yellow_duration = 5  # seconds
         
         return  green_duration, yellow_duration
-route_file = os.getenv("OUTPUT_TRIPS_FILE")
-max_steps = 5400  # Example max steps, adjust as needed
-get_durations(route_file, max_steps)
+# route_file = os.getenv("OUTPUT_TRIPS_FILE")
+# max_steps = 5400  # Example max steps, adjust as needed
+# get_durations(route_file, max_steps)
