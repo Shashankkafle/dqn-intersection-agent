@@ -47,9 +47,10 @@ if __name__ == "__main__":
         config['max_steps'],
         config['green_duration'],
         config['yellow_duration'],
+        config['clearence_interval'],
         config['num_states'],
         config['num_actions'],
-        False
+        False,
     )
     Cyclic_Simulation = Simulation(
         Model,
@@ -58,10 +59,12 @@ if __name__ == "__main__":
         config['max_steps'],
         config['green_duration'],
         config['yellow_duration'],
+        config['clearence_interval'],
         config['num_states'],
         config['num_actions'],
         True,
-        durations=fixed_durations
+        durations=fixed_durations,
+        
     )
 
     print('\n----- Test episode')
