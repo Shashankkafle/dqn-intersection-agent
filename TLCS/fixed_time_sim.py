@@ -15,7 +15,13 @@ PHASE_EWL_GREEN = 6  # action 3 code 11
 PHASE_EWL_YELLOW = 7
 
 
-action_number_to_phase = {
+action_number_to_phase_name = {
+    0: "PHASE_NS_GREEN",
+    1: "PHASE_NSL_GREEN",
+    2: "PHASE_EW_GREEN",
+    3: "PHASE_EWL_GREEN"
+}
+action_number_to_phase_number = {
     0: PHASE_NS_GREEN,
     1: PHASE_NSL_GREEN,
     2: PHASE_EW_GREEN,
@@ -45,9 +51,6 @@ class Simulation:
         Runs the testing simulation
         """
         start_time = timeit.default_timer()
-
-        # first, generate the route file for this simulation and set up sumo
-        self._TrafficGen.generate_routefile(seed=episode)
         traci.start(self._sumo_cmd)
         print("Simulating...")
 
@@ -161,8 +164,8 @@ class Simulation:
         """
         Activate the correct green light combination in sumo
         """
-        action = action_number_to_phase.get(action_number)
-        traci.trafficlight.setPhase("TL", action)
+        phase = action_number_to_phase_number.get(action_number)
+        traci.trafficlight.setPhase("TL", phase)
         # if action_number == 0:
         #     traci.trafficlight.setPhase("TL", PHASE_NS_GREEN)
         # elif action_number == 1:

@@ -5,10 +5,11 @@ import os
 from shutil import copyfile
 
 from fixed_time_sim import Simulation
-from generator import TrafficGenerator
+from universal_generator import UniversalTrafficGenerator
 from model import TestModel
 from visualization import Visualization
 from utils import import_test_configuration, set_sumo, set_test_path
+from fixed_duration_calculation import get_durations 
 
 
 if __name__ == "__main__":
@@ -16,22 +17,29 @@ if __name__ == "__main__":
     config = import_test_configuration(config_file='testing_settings.ini')
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
     model_path, plot_path, comaprision_path = set_test_path(config['models_path_name'], config['model_to_test'])
+    OUTPUT_TRIPS_FILE = os.getenv("OUTPUT_TRIPS_FILE")
+    NET_FILE = os.getenv("NET_FILE")
 
     Model = TestModel(
         input_dim=config['num_states'],
         model_path=model_path
     )
 
-    TrafficGen = TrafficGenerator(
-        config['max_steps'], 
-        config['n_cars_generated']
+    TrafficGen = UniversalTrafficGenerator(
+        NET_FILE,
+        OUTPUT_TRIPS_FILE,
+        sim_end=config['max_steps'],
+        vehicle_count= config['n_cars_generated'] 
     )
+    TrafficGen.generate_routefile(seed=0)
 
     visualization = Visualization(
        comaprision_path, 
         dpi=96
     )
-        
+    
+    fixed_durations = get_durations(OUTPUT_TRIPS_FILE, config['max_steps'])
+
     Model_Simulation = Simulation(
         Model,
         TrafficGen,
@@ -52,7 +60,8 @@ if __name__ == "__main__":
         config['yellow_duration'],
         config['num_states'],
         config['num_actions'],
-        True
+        True,
+        durations=fixed_durations
     )
 
     print('\n----- Test episode')
