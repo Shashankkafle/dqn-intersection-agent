@@ -29,7 +29,7 @@ action_number_to_phase_number = {
 }
 
 class Simulation:
-    def __init__(self, Model, TrafficGen, sumo_cmd, max_steps, green_duration, yellow_duration, num_states, num_actions, fixed_time=False, durations={}):
+    def __init__(self, Model, TrafficGen, sumo_cmd, max_steps, green_duration, yellow_duration,clearence_duration, num_states, num_actions, fixed_time=False, durations={}):
         self._Model = Model
         self._TrafficGen = TrafficGen
         self._step = 0
@@ -37,6 +37,7 @@ class Simulation:
         self._max_steps = max_steps
         self._green_duration = green_duration
         self._yellow_duration = yellow_duration
+        self._clearence_duration = clearence_duration
         self._num_states = num_states
         self._num_actions = num_actions
         self._reward_episode = []
@@ -83,6 +84,8 @@ class Simulation:
             if self._step != 0 and old_action != action:
                 self._set_yellow_phase(old_action)
                 self._simulate(self._yellow_duration)
+                self._set_clearence_phase()
+                self._simulate(self._clearence_duration)
 
             # execute the phase selected before
             self._set_green_phase(action)
@@ -158,6 +161,13 @@ class Simulation:
         """
         yellow_phase_code = old_action * 2 + 1 # obtain the yellow phase code, based on the old action (ref on environment.net.xml)
         traci.trafficlight.setPhase("TL", yellow_phase_code)
+        
+    def _set_clearence_phase(self):
+        """
+        Activate the correct yellow light combination in sumo
+        """
+        clearence_phase_code = 8 # CAUTION: make sure this matches the network file
+        traci.trafficlight.setPhase("TL", clearence_phase_code)
 
 
     def _set_green_phase(self, action_number):

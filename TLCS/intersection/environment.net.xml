@@ -133,6 +133,7 @@
         <phase duration="100" state="rrrrryyyyrrrrrryyyyr"/>
         <phase duration="100" state="rrrrrrrrrGrrrrrrrrrG"/>
         <phase duration="100" state="rrrrrrrrryrrrrrrrrry"/>
+        <phase duration="100" state="rrrrrrrrrrrrrrrrrrrr"/>
     </tlLogic>
 
     <junction id="DE" type="dead_end" x="750.00" y="0.00" incLanes="TL2E_0 TL2E_1 TL2E_2 TL2E_3" intLanes="" shape="750.00,0.00 750.00,-12.80 750.00,0.00"/>

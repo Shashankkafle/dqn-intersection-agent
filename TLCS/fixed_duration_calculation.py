@@ -1,7 +1,7 @@
 import os
 import sumolib
 from dotenv import load_dotenv
-
+import math
 # All constant assumptions
 PHF = 0.9  # Peak Hourly Factor
 S=1800  # Saturation flow rate  = 3600/headway assuming 2 seconds headway
@@ -29,8 +29,19 @@ phase_to_lane_group = {
     "PHASE_EWL_GREEN": ["route_E2TL_TL2S", "route_W2TL_TL2N"]
 }
 load_dotenv(override=True)
-def get_analysis_flow():
- return
+
+
+def round_up_to_multiple_of_5(number):
+  """
+  Rounds a number up to the closest multiple of 5.
+
+  Args:
+    number: The number to be rounded.
+
+  Returns:
+    The number rounded up to the closest multiple of 5.
+  """
+  return int(math.ceil(number / 5) * 5)
 
 def get_durations(route_file,max_steps):
         """
@@ -109,7 +120,7 @@ def get_durations(route_file,max_steps):
             critical_lane = phase_to_critical_lane[phase]
             if critical_lane in lane_group_to_flow_ratio:
                 critical_lane_flow_ratio = lane_group_to_flow_ratio[critical_lane]
-                green_duration = critical_lane_flow_ratio * (optimal_cycle_length / Xc)
+                green_duration = round_up_to_multiple_of_5( critical_lane_flow_ratio * (optimal_cycle_length / Xc))
                 phase_to_green_duration[phase] = green_duration
                 print(f"Phase {phase} green duration: {green_duration} seconds")
             else:

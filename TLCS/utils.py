@@ -17,6 +17,7 @@ def import_train_configuration(config_file):
     config['n_cars_generated'] = content['simulation'].getint('n_cars_generated')
     config['green_duration'] = content['simulation'].getint('green_duration')
     config['yellow_duration'] = content['simulation'].getint('yellow_duration')
+    config['clearence_interval'] = content['simulation'].getint('clearence_interval') 
     config['num_layers'] = content['model'].getint('num_layers')
     config['width_layers'] = content['model'].getint('width_layers')
     config['batch_size'] = content['model'].getint('batch_size')
@@ -45,6 +46,7 @@ def import_test_configuration(config_file):
     config['episode_seed'] = content['simulation'].getint('episode_seed')
     config['green_duration'] = content['simulation'].getint('green_duration')
     config['yellow_duration'] = content['simulation'].getint('yellow_duration')
+    config['clearence_interval'] = content['simulation'].getint('clearence_interval')
     config['num_states'] = content['agent'].getint('num_states')
     config['num_actions'] = content['agent'].getint('num_actions')
     config['sumocfg_file_name'] = content['dir']['sumocfg_file_name']
