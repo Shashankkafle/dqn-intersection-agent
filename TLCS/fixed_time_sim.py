@@ -90,8 +90,9 @@ class Simulation:
             # execute the phase selected before
             self._set_green_phase(action)
             if self._fixed_time:
-                # use fixed durations if provided
-                green_duration = self._durations.get(action, self._green_duration)
+                phase_name = action_number_to_phase_name.get(action)
+                green_duration = self._durations.get(phase_name)
+                print("self._durations",self._durations,"action",phase_name,)
                 print(f"Using fixed green duration: {green_duration} seconds for action {action}")
             else:
                 # use the configured green duration
