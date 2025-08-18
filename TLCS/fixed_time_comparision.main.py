@@ -105,6 +105,6 @@ if __name__ == "__main__":
         fixed_time_data=Cyclic_Simulation.avg_wait_episode,
         model_data=Model_Simulation.avg_wait_episode,
         filename='average_wait_length_comparison',
-        xlabel='Step', 
+        xlabel='Action Step', 
         ylabel='Average Wait'
     )
