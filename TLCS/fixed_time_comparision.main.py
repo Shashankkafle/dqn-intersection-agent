@@ -31,14 +31,14 @@ if __name__ == "__main__":
         sim_end=config['max_steps'],
         vehicle_count= config['n_cars_generated'] 
     )
-    TrafficGen.generate_routefile(seed=0)
+    route_weights = TrafficGen.generate_routefile(seed=0)
 
     visualization = Visualization(
        comaprision_path, 
         dpi=96
     )
     
-    fixed_durations = get_durations(OUTPUT_TRIPS_FILE, config['max_steps'])
+    fixed_durations, lane_group_counts = get_durations(OUTPUT_TRIPS_FILE, config['max_steps'])
 
     Model_Simulation = Simulation(
         Model,
@@ -77,8 +77,34 @@ if __name__ == "__main__":
     copyfile(src='testing_settings.ini', dst=os.path.join(plot_path, 'testing_settings.ini'))
 
     visualization.save_data_and_plot(data=Model_Simulation.reward_episode, filename='model_reward', xlabel='Action step', ylabel='Reward')
-    visualization.save_data_and_plot(data=Model_Simulation.queue_length_episode, filename='model_queue', xlabel='Step', ylabel='Queue lenght (vehicles)')
+    visualization.save_data_and_plot(data=Model_Simulation.queue_length_episode, filename='model_queue', xlabel='Step', ylabel='Queue length (vehicles)')
     visualization.save_data_and_plot(data=Model_Simulation.avg_wait_episode, filename='model_average_wait', xlabel='Step', ylabel='Average wait (vehicles)')
     visualization.save_data_and_plot(data=Cyclic_Simulation.reward_episode, filename='fixed_time_reward', xlabel='Action step', ylabel='Reward')
-    visualization.save_data_and_plot(data=Cyclic_Simulation.queue_length_episode, filename='fixed_time_queue', xlabel='Step', ylabel='Queue lenght (vehicles)')
+    visualization.save_data_and_plot(data=Cyclic_Simulation.queue_length_episode, filename='fixed_time_queue', xlabel='Step', ylabel='Queue length (vehicles)')
     visualization.save_data_and_plot(data=Cyclic_Simulation.avg_wait_episode, filename='fixed_time_average_wait', xlabel='Step', ylabel='Average Wait (vehicles)')
+    visualization.save_data(
+        data=fixed_durations,
+        filename='webster_fixed_timings'
+    )
+    visualization.save_data(
+        data=lane_group_counts,
+        filename='vehicles_per_lane_group'
+    )
+    visualization.save_data(
+        data=route_weights,
+        filename='route_weights'
+    )
+    visualization.overlayed_plot(
+        fixed_time_data=Cyclic_Simulation.queue_length_episode,
+        model_data=Model_Simulation.queue_length_episode,
+        filename='queue_length_comparison',
+        xlabel='Step', 
+        ylabel='Queue length (vehicles)'
+    )
+    visualization.overlayed_plot(
+        fixed_time_data=Cyclic_Simulation.avg_wait_episode,
+        model_data=Model_Simulation.avg_wait_episode,
+        filename='average_wait_length_comparison',
+        xlabel='Step', 
+        ylabel='Average Wait'
+    )

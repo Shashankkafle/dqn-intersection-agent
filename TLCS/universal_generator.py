@@ -136,6 +136,11 @@ class UniversalTrafficGenerator:
         # routes = self.generate_routes()
         trips = self._generate_trips(seed)
         self._write_trips(trips)
+        return self._route_weights
+    
+    @property
+    def route_weights(self):
+        return self._route_weights
 
 
     

@@ -128,7 +128,7 @@ def get_durations(route_file,max_steps):
             
         print("phase to green duration", phase_to_green_duration)
         
-        return  phase_to_green_duration
+        return  phase_to_green_duration,lane_group_counts
 # route_file = os.getenv("OUTPUT_TRIPS_FILE")
 # max_steps = 5400  # Example max steps, adjust as needed
 # get_durations(route_file, max_steps)
