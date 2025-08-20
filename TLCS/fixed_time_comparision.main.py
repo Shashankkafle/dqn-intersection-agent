@@ -108,3 +108,10 @@ if __name__ == "__main__":
         xlabel='Action Step', 
         ylabel='Average Wait'
     )
+    visualization.overlayed_plot(
+        fixed_time_data=Cyclic_Simulation._reward_episode,
+        model_data=Model_Simulation._reward_episode,
+        filename='reward_comparison',
+        xlabel='Step', 
+        ylabel='Reward'
+    )
