@@ -50,8 +50,8 @@ class Visualization:
         """
         # Plot each with its own x-axis length
         plt.figure(figsize=(20, 5))
-        plt.plot(range(len(fixed_time_data)), fixed_time_data, label=f'Fixed Time {ylabel}', marker='o')
-        plt.plot(range(len(model_data)), model_data, label=f'Model {ylabel}', marker='s')
+        plt.plot(range(len(fixed_time_data)), fixed_time_data, label=f'Fixed Time {ylabel}', color='b')
+        plt.plot(range(len(model_data)), model_data, label=f'Model {ylabel}', color='r')
         plt.axhline(0, color='gray', linestyle='--')
         plt.title(f"{ylabel} Comparison")
         plt.xlabel(xlabel)
