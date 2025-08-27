@@ -129,12 +129,9 @@ class Simulation:
 
     def _collect_cum_waiting_time(self):
                 car_list = traci.vehicle.getIDList()
-                print("car_list size",len(car_list))
                 for car_id in car_list:
                     wait_time = traci.vehicle.getAccumulatedWaitingTime(car_id)
                     self._cum_wait_time_per_vehicle[car_id] = wait_time
-                
-                print("_cum_wait_time_per_vehicle",self._cum_wait_time_per_vehicle)
                 # print("total_waiting_time in cum",total_waiting_time)
                 # return total_waiting_time
     def _collect_waiting_times(self):

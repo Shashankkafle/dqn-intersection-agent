@@ -71,7 +71,7 @@ if __name__ == "__main__":
             
         )
 
-        print('\n----- Test episode')
+        print('\n----- Test episode',i)
         simulation_time = Model_Simulation.run(config['episode_seed'])  # run the simulation
         simulation_time = Cyclic_Simulation.run(config['episode_seed'])  # run the simulation
         print('Simulation time:', simulation_time, 's')
@@ -149,3 +149,4 @@ if __name__ == "__main__":
             ylabel='Reward',
             foldername=f'test_episode{i}'
         )
+    print("----- Testing info saved at:", plot_path, "for episode i")

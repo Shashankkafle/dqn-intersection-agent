@@ -131,9 +131,11 @@ class UniversalTrafficGenerator:
         tree.write(self._output_trips_file, encoding="UTF-8", xml_declaration=True)
         print(f"✅ Trips written to {self._output_trips_file}")
     
-    def generate_routefile(self,seed):
+    def generate_routefile(self,seed,vehicle_count=None):
         print("Starting trip generation...")
         # routes = self.generate_routes()
+        if vehicle_count:
+            self._vehicle_count = vehicle_count
         trips = self._generate_trips(seed)
         self._write_trips(trips)
         return self._route_weights
