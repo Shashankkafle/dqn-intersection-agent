@@ -161,3 +161,6 @@ if __name__ == "__main__":
                 ylabel='Reward',
                 foldername=f'test_episode{i}'
             )
+            
+            copyfile(src=OUTPUT_TRIPS_FILE, dst=os.path.join(comaprision_path,f'test_episode{i}', 'episode_routes_rou.xml'))
+
