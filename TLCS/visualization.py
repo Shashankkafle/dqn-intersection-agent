@@ -30,12 +30,26 @@ class Visualization:
             for value in data:
                     file.write("%s\n" % value)
 
-    def save_data(self, data, filename):
+    def save_data(self, data, filename,foldername=None):
         """
             Save any data related to the training to a txt file   
         """
-        with open(os.path.join(self._path, filename + '.txt'), "w") as file:
-             file.write(str(data))
+        # with open(os.path.join(self._path, "xyz" + '.txt'), "w") as file:
+        #      file.write(str("data"))
+        # return
+        if foldername:
+            folder_path = os.path.join(self._path, foldername)
+            os.makedirs(folder_path, exist_ok=True)
+            file_location = os.path.join(folder_path, filename + '.txt')  # make a file path
+        else: 
+            file_location = os.path.join(self._path, filename + '.txt')
+        with open(file_location, "w") as file:
+            file.write(str(data))
+
+            if os.path.exists(file_location):
+                print("✅ File successfully written!")
+            else:
+                print("❌ File was not created!")
             # for key, value in data.items():
             #     if isinstance(value, (list, tuple)):
             #         file.write(f"{key}:\n")
@@ -44,10 +58,16 @@ class Visualization:
             #     else:
             #         file.write(f"{key}: {value}\n")
           
-    def overlayed_plot(self, fixed_time_data, model_data, filename, xlabel, ylabel):
+    def overlayed_plot(self, fixed_time_data, model_data, filename, xlabel, ylabel,foldername=None):
         """
-        Produce an overlayed plot of two datasets and save the relative data to txt
+        Produce an overlayed plot of two datasets
         """
+        if foldername:
+            folder_path = os.path.join(self._path, foldername)
+            os.makedirs(folder_path, exist_ok=True)
+            file_location = os.path.join(folder_path, filename + '.png')  # make a file path
+        else: 
+            file_location = os.path.join(self._path, filename + '.png')
         # Plot each with its own x-axis length
         plt.figure(figsize=(20, 5))
         plt.plot(range(len(fixed_time_data)), fixed_time_data, label=f'Fixed Time {ylabel}', color='b')
@@ -60,5 +80,5 @@ class Visualization:
         plt.grid(True)
         plt.tight_layout()
         fig = plt.gcf()
-        fig.savefig(os.path.join(self._path, 'plot_'+filename+'.png'), dpi=self._dpi)
+        fig.savefig(file_location, dpi=self._dpi)
         plt.close("all")

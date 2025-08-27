@@ -42,6 +42,7 @@ class Simulation:
         self._num_actions = num_actions
         self._reward_episode = []
         self._avg_wait_episode = []
+        self._cum_wait_time_per_vehicle = {}
         self._queue_length_episode = []
         self._fixed_time = fixed_time  # Flag to indicate if fixed time simulation is used
         self._durations = durations  # Dictionary to hold fixed durations for each action if provided
@@ -72,12 +73,10 @@ class Simulation:
             reward = old_total_wait - current_total_wait
             if self._fixed_time:
                 action = (old_action + 1) % self._num_actions # cyclical action
-                print("fixed time",action)
 
             else:
                 # choose the light phase to activate, based on the current state of the intersection
                 action = self._choose_action(current_state)
-                print("model based",action)
 
 
             # if the chosen phase is different from the last phase, activate the yellow phase
@@ -92,12 +91,12 @@ class Simulation:
             if self._fixed_time:
                 phase_name = action_number_to_phase_name.get(action)
                 green_duration = self._durations.get(phase_name)
-                print("self._durations",self._durations,"action",phase_name,)
-                print(f"Using fixed green duration: {green_duration} seconds for action {action}")
+                # print("self._durations",self._durations,"action",phase_name,)
+                # print(f"Using fixed green duration: {green_duration} seconds for action {action}")
             else:
                 # use the configured green duration
                 green_duration = self._green_duration
-            self._simulate(self._green_duration)
+            self._simulate(green_duration)
 
             # saving variables for later & accumulate reward
             old_action = action
@@ -105,8 +104,8 @@ class Simulation:
 
             self._reward_episode.append(reward)
             self._avg_wait_episode.append(current_average_wait)
-
-
+            
+        
         traci.close()
         simulation_time = round(timeit.default_timer() - start_time, 1)
 
@@ -126,8 +125,18 @@ class Simulation:
             steps_todo -= 1
             queue_length = self._get_queue_length() 
             self._queue_length_episode.append(queue_length)
+            self._collect_cum_waiting_time()
 
-
+    def _collect_cum_waiting_time(self):
+                car_list = traci.vehicle.getIDList()
+                print("car_list size",len(car_list))
+                for car_id in car_list:
+                    wait_time = traci.vehicle.getAccumulatedWaitingTime(car_id)
+                    self._cum_wait_time_per_vehicle[car_id] = wait_time
+                
+                print("_cum_wait_time_per_vehicle",self._cum_wait_time_per_vehicle)
+                # print("total_waiting_time in cum",total_waiting_time)
+                # return total_waiting_time
     def _collect_waiting_times(self):
         """
         Retrieve the waiting time of every car in the incoming roads
@@ -144,7 +153,6 @@ class Simulation:
                     del self._waiting_times[car_id] 
         total_waiting_time = sum(self._waiting_times.values())
         average_waiting_time = total_waiting_time / len(self._waiting_times) if self._waiting_times else 0
-        print("total_waiting_time in generator",total_waiting_time)
         return total_waiting_time, average_waiting_time
 
 
@@ -265,7 +273,6 @@ class Simulation:
 
             if valid_car:
                 state[car_position] = 1  # write the position of the car car_id in the state array in the form of "cell occupied"
-        # print("State Update: ", state)
         return state
 
 
@@ -281,6 +288,9 @@ class Simulation:
     @property
     def avg_wait_episode(self):
         return self._avg_wait_episode
-
+    
+    @property
+    def cum_wait_time_per_vehicle(self):
+        return self._cum_wait_time_per_vehicle
 
 

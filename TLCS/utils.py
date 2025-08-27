@@ -103,7 +103,7 @@ def set_test_path(models_path_name, model_n):
     """
     model_folder_path = os.path.join(os.getcwd(), models_path_name, 'model_'+str(model_n), '')
 
-   
+    print("model_folder_path", model_folder_path)
     if os.path.isdir(model_folder_path):    
         plot_path = os.path.join(model_folder_path, 'test', '')
         comparision_path = os.path.join(model_folder_path, 'test', 'comparision', '')
