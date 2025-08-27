@@ -98,7 +98,7 @@ if __name__ == "__main__":
             episode_stats['n_cars_generated'] = config['n_cars_generated']
             # print("----- Testing info saved at:", plot_path)
 
-            copyfile(src='testing_settings.ini', dst=os.path.join(plot_path, 'testing_settings.ini'))
+            # copyfile(src='testing_settings.ini', dst=os.path.join(plot_path, 'testing_settings.ini'))
 
             visualization.save_data(foldername=f'test_episode{i}',data=Model_Simulation.reward_episode, filename='model_reward', )
             visualization.save_data(foldername=f'test_episode{i}',data=Model_Simulation.queue_length_episode, filename='model_queue')
@@ -135,6 +135,11 @@ if __name__ == "__main__":
             visualization.save_data(
                 data=episode_stats,
                 filename='episode_stats',
+                foldername=f'test_episode{i}'
+            )
+            visualization.save_data(
+                data=config,
+                filename='training_settings',
                 foldername=f'test_episode{i}'
             )
             visualization.overlayed_plot(
