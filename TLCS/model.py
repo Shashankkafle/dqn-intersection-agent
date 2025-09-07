@@ -35,6 +35,23 @@ class TrainModel:
         model.compile(loss=losses.mean_squared_error, optimizer=Adam(lr=self._learning_rate))
         return model
     
+    def _build_model_with_cnn(self, input_dim):
+        """
+        Build and compile a fully connected deep neural network with  CNN layers for fearture extraction
+        """
+        # Harcoded for now for width for width of  512 and 4 actions, can be made more flexible later
+
+        inputs = keras.Input(shape=(self._input_dim,))
+        x = layers.Dense(width, activation='relu')(inputs)
+        while (width>num_actions):
+            x = layers.Dense(width, activation='relu')(x)
+            width = width/2
+        outputs = layers.Dense(self._output_dim, activation='linear')(x)
+
+        model = keras.Model(inputs=inputs, outputs=outputs, name='my_model')
+        model.compile(loss=losses.mean_squared_error, optimizer=Adam(lr=self._learning_rate))
+        return model
+    
 
     def predict_one(self, state):
         """
