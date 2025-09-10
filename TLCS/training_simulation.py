@@ -14,7 +14,24 @@ PHASE_EW_YELLOW = 5
 PHASE_EWL_GREEN = 6  # action 3 code 11
 PHASE_EWL_YELLOW = 7
 
-
+lane_id_to_index = {
+    "W2TL_0": 0,
+    "W2TL_1": 1,
+    "W2TL_2": 2,
+    "W2TL_3": 3,
+    "N2TL_0": 4,
+    "N2TL_1": 5,
+    "N2TL_2": 6,
+    "N2TL_3": 7,
+    "E2TL_0": 8,
+    "E2TL_1": 9,
+    "E2TL_2": 10,
+    "E2TL_3": 11,
+    "S2TL_0": 12,
+    "S2TL_1": 13,
+    "S2TL_2": 14,
+    "S2TL_3": 15
+}
 class Simulation:
     def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, clearence_duration, num_states, num_actions, training_epochs):
         self._Model = Model
@@ -71,7 +88,8 @@ class Simulation:
                 self._Memory.add_sample((old_state, old_action, reward, current_state))
 
             # choose the light phase to activate, based on the current state of the intersection
-            action = self._choose_action(current_state, epsilon)
+            action = 1
+            # action = self._choose_action(current_state, epsilon)
 
             # if the chosen phase is different from the last phase, activate the yellow phase
             if self._step != 0 and old_action != action:
@@ -190,75 +208,31 @@ class Simulation:
         queue_length = halt_N + halt_S + halt_E + halt_W
         return queue_length
 
-
     def _get_state(self):
-        """
-        Retrieve the state of the intersection from sumo, in the form of cell occupancy
-        """
-        state = np.zeros(self._num_states)
-        car_list = traci.vehicle.getIDList()
+            """
+            Retrieve the state of the intersection from sumo, in the form of cell occupancy
+            """
+        # The magic numbber 16 represents the number of states and 19 represents the number of cells per lane
+            position_state = np.zeros((16,19))
+            speed_state = np.zeros((16,19))
+            car_list = traci.vehicle.getIDList()
 
-        for car_id in car_list:
-            lane_pos = traci.vehicle.getLanePosition(car_id)
-            lane_id = traci.vehicle.getLaneID(car_id)
-            lane_pos = 750 - lane_pos  # inversion of lane pos, so if the car is close to the traffic light -> lane_pos = 0 --- 750 = max len of a road
-
-            # distance in meters from the traffic light -> mapping into cells
-            if lane_pos < 7:
-                lane_cell = 0
-            elif lane_pos < 14:
-                lane_cell = 1
-            elif lane_pos < 21:
-                lane_cell = 2
-            elif lane_pos < 28:
-                lane_cell = 3
-            elif lane_pos < 40:
-                lane_cell = 4
-            elif lane_pos < 60:
-                lane_cell = 5
-            elif lane_pos < 100:
-                lane_cell = 6
-            elif lane_pos < 160:
-                lane_cell = 7
-            elif lane_pos < 400:
-                lane_cell = 8
-            elif lane_pos <= 750:
-                lane_cell = 9
-
-            # finding the lane where the car is located 
-            # x2TL_3 are the "turn left only" lanes
-            if lane_id == "W2TL_0" or lane_id == "W2TL_1" or lane_id == "W2TL_2":
-                lane_group = 0
-            elif lane_id == "W2TL_3":
-                lane_group = 1
-            elif lane_id == "N2TL_0" or lane_id == "N2TL_1" or lane_id == "N2TL_2":
-                lane_group = 2
-            elif lane_id == "N2TL_3":
-                lane_group = 3
-            elif lane_id == "E2TL_0" or lane_id == "E2TL_1" or lane_id == "E2TL_2":
-                lane_group = 4
-            elif lane_id == "E2TL_3":
-                lane_group = 5
-            elif lane_id == "S2TL_0" or lane_id == "S2TL_1" or lane_id == "S2TL_2":
-                lane_group = 6
-            elif lane_id == "S2TL_3":
-                lane_group = 7
-            else:
-                lane_group = -1
-
-            if lane_group >= 1 and lane_group <= 7:
-                car_position = int(str(lane_group) + str(lane_cell))  # composition of the two postion ID to create a number in interval 0-79
-                valid_car = True
-            elif lane_group == 0:
-                car_position = lane_cell
-                valid_car = True
-            else:
-                valid_car = False  # flag for not detecting cars crossing the intersection or driving away from it
-
-            if valid_car:
-                state[car_position] = 1  # write the position of the car car_id in the state array in the form of "cell occupied"
-
-        return state
+            for car_id in car_list:
+                lane_pos = traci.vehicle.getLanePosition(car_id)
+                lane_id = traci.vehicle.getLaneID(car_id)
+                # may have to switch 750 to other number to match paper
+                lane_pos = 750 - lane_pos  # inversion of lane pos, so if the car is close to the traffic light -> lane_pos = 0 --- 750 = max len of a road
+                lane_index = lane_id_to_index.get(lane_id)
+                if not lane_index:
+                    continue
+                if lane_index is None:
+                    raise ValueError(f"Unexpected lane ID: {lane_id}")
+                cell_index = min(int(lane_pos // 7.5), 18)  # Each cell represents 7.5 meters, max index is 18
+                position_state[lane_index, cell_index] = 1  # Mark the cell as occupied
+                speed_state[lane_index, cell_index] = traci.vehicle.getSpeed(car_id) #Normalize it or not?
+                print(f"Car {car_id} in lane {lane_id} at position {lane_pos} occupies cell {cell_index} in lane index {lane_index}")
+                
+            return position_state
 
 
     def _replay(self):
