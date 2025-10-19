@@ -120,6 +120,7 @@ class UniversalTrafficGenerator:
             from_edge = route[0].getID()
             to_edge = route[1].getID()
             ET.SubElement(root, "route", id=self._routeIdFromEdges(from_edge, to_edge), edges=f"{from_edge} {to_edge}")
+    # Change max speed here the value is given in meter per second
         ET.SubElement(root, "vType", id=self._VEHICLE_TYPE, accel="2.6", decel="4.5", sigma="0.5", length="5", minGap="2.5", maxSpeed="50")
 
         for trip in trips:

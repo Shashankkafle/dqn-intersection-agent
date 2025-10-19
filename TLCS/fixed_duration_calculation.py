@@ -120,6 +120,7 @@ def get_durations(route_file,max_steps):
             critical_lane = phase_to_critical_lane[phase]
             if critical_lane in lane_group_to_flow_ratio:
                 critical_lane_flow_ratio = lane_group_to_flow_ratio[critical_lane]
+                print(f"unrounded duration for{phase} ",critical_lane_flow_ratio * (optimal_cycle_length / Xc))
                 green_duration = round_up_to_multiple_of_5( critical_lane_flow_ratio * (optimal_cycle_length / Xc))
                 phase_to_green_duration[phase] = green_duration
                 print(f"Phase {phase} green duration: {green_duration} seconds")

@@ -7,8 +7,10 @@ from universal_generator import UniversalTrafficGenerator
 # This is a test script just to test code. It is like a rough notebook.
 load_dotenv(override=True)
 config = import_train_configuration(config_file='training_settings.ini')
-output_trips_file = "D:/q-earning/dqn-intersection-agent/TLCS/intersection/test_route.rou.xml"
-NET_FILE = os.getenv("NET_FILE")
+output_trips_file = "D:/q-earning/dqn-intersection-agent/TLCS/intersection/test_route1.rou.xml"
+NET_FILE = "D:/q-earning/dqn-intersection-agent/TLCS/intersection/three_lanes.net.xml"
+
+# NET_FILE = os.getenv("NET_FILE")
 TrafficGen = UniversalTrafficGenerator(
     NET_FILE,
     output_trips_file,
