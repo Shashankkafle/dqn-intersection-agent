@@ -60,6 +60,8 @@ class Simulation:
 
             # get current state of the intersection
             current_state = self._get_state()
+            # print("step, action:", self._step)
+            # print("state:", current_state)
 
             # calculate reward of previous action: (change in cumulative waiting time between actions)
             # waiting time = seconds waited by a car since the spawn in the environment, cumulated for every car in incoming lanes
@@ -83,7 +85,7 @@ class Simulation:
             # execute the phase selected before
             self._set_green_phase(action)
             self._simulate(self._green_duration)
-
+            # print("action:", action)
             # saving variables for later & accumulate reward
             old_state = current_state
             old_action = action
@@ -94,7 +96,7 @@ class Simulation:
                 self._sum_neg_reward += reward
 
         self._save_episode_stats()
-        print("Total reward:", self._sum_neg_reward, "- Epsilon:", round(epsilon, 2))
+        # print("Total reward:", self._sum_neg_reward, "- Epsilon:", round(epsilon, 2))
         traci.close()
         simulation_time = round(timeit.default_timer() - start_time, 1)
 
@@ -226,22 +228,22 @@ class Simulation:
                 lane_cell = 9
 
             # finding the lane where the car is located 
-            # x2TL_3 are the "turn left only" lanes
-            if lane_id == "W2TL_0" or lane_id == "W2TL_1" or lane_id == "W2TL_2":
+            # x2TL_2 are the "turn right" lanes for three lane roads
+            if lane_id == "W2TL_0" or lane_id == "W2TL_1":
                 lane_group = 0
-            elif lane_id == "W2TL_3":
+            elif lane_id == "W2TL_2":
                 lane_group = 1
-            elif lane_id == "N2TL_0" or lane_id == "N2TL_1" or lane_id == "N2TL_2":
+            elif lane_id == "N2TL_0" or lane_id == "N2TL_1":
                 lane_group = 2
-            elif lane_id == "N2TL_3":
+            elif lane_id == "N2TL_2":
                 lane_group = 3
-            elif lane_id == "E2TL_0" or lane_id == "E2TL_1" or lane_id == "E2TL_2":
+            elif lane_id == "E2TL_0" or lane_id == "E2TL_1":
                 lane_group = 4
-            elif lane_id == "E2TL_3":
+            elif lane_id == "E2TL_2":
                 lane_group = 5
-            elif lane_id == "S2TL_0" or lane_id == "S2TL_1" or lane_id == "S2TL_2":
+            elif lane_id == "S2TL_0" or lane_id == "S2TL_1":
                 lane_group = 6
-            elif lane_id == "S2TL_3":
+            elif lane_id == "S2TL_2":
                 lane_group = 7
             else:
                 lane_group = -1
