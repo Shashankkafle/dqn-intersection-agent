@@ -51,7 +51,7 @@ if __name__ == "__main__":
         vehicle_count= config['n_cars_generated'] 
     )
     route_weights = TrafficGen._route_weights
-    Visualization = Visualization(
+    visualization = Visualization(
         path, 
         dpi=96
     )
@@ -79,6 +79,19 @@ if __name__ == "__main__":
         epsilon = 1.0 - (episode / config['total_episodes'])  # set the epsilon for this episode according to epsilon-greedy policy
         simulation_time, training_time = Simulation.run(episode, epsilon)  # run the simulation
         print('Simulation time:', simulation_time, 's - Training time:', training_time, 's - Total:', round(simulation_time+training_time, 1), 's')
+        if(episode % 20 == 0 and episode != 0):
+            temp_path = os.path.join(path, 'episode'+str(episode))
+            os.makedirs(temp_path, exist_ok=True)
+            temp_visualizaton =Visualization(
+                temp_path, 
+                dpi=96
+            )
+            
+            temp_visualizaton.save_data_and_plot(data=Simulation.reward_store, filename='reward', xlabel='Episode', ylabel='Cumulative negative reward')
+            temp_visualizaton.save_data_and_plot(data=Simulation.cumulative_wait_store, filename='delay', xlabel='Episode', ylabel='Cumulative delay (s)')
+            temp_visualizaton.save_data_and_plot(data=Simulation.avg_queue_length_store, filename='queue', xlabel='Episode', ylabel='Average queue length (vehicles)')
+            temp_visualizaton.save_data(route_weights, filename='route_weights')
+            Model.save_model(temp_path)
         episode += 1
 
     print("\n----- Start time:", timestamp_start)
@@ -89,7 +102,8 @@ if __name__ == "__main__":
 
     copyfile(src='training_settings.ini', dst=os.path.join(path, 'training_settings.ini'))
 
-    Visualization.save_data_and_plot(data=Simulation.reward_store, filename='reward', xlabel='Episode', ylabel='Cumulative negative reward')
-    Visualization.save_data_and_plot(data=Simulation.cumulative_wait_store, filename='delay', xlabel='Episode', ylabel='Cumulative delay (s)')
-    Visualization.save_data_and_plot(data=Simulation.avg_queue_length_store, filename='queue', xlabel='Episode', ylabel='Average queue length (vehicles)')
-    Visualization.save_data(route_weights, filename='route_weights')
+    visualization.save_data_and_plot(data=Simulation.reward_store, filename='reward', xlabel='Episode', ylabel='Cumulative negative reward')
+    visualization.save_data_and_plot(data=Simulation.cumulative_wait_store, filename='delay', xlabel='Episode', ylabel='Cumulative delay (s)')
+    visualization.save_data_and_plot(data=Simulation.avg_queue_length_store, filename='queue', xlabel='Episode', ylabel='Average queue length (vehicles)')
+    visualization.save_data(route_weights, filename='route_weights')
+    copyfile(src='intersection\sumo_config.sumocfg', dst=os.path.join(path, 'sumo_config.sumocfg'))
