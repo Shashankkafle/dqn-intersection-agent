@@ -120,7 +120,7 @@ class UniversalTrafficGenerator:
             from_edge = route[0].getID()
             to_edge = route[1].getID()
             ET.SubElement(root, "route", id=self._routeIdFromEdges(from_edge, to_edge), edges=f"{from_edge} {to_edge}")
-        ET.SubElement(root, "vType", id=self._VEHICLE_TYPE, accel="2.6", decel="4.5", sigma="0.5", length="5", minGap="2.5", maxSpeed="50")
+        ET.SubElement(root, "vType", id=self._VEHICLE_TYPE, accel="2.6", decel="4.5", sigma="0.5", length="5", minGap="2.5", maxSpeed="25")
 
         for trip in trips:
             ET.SubElement(root, "vehicle", id=trip["id"],depart=trip["depart"], route=trip["route"],departLane="random",departSpeed="10", type=self._VEHICLE_TYPE)

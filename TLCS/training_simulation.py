@@ -201,7 +201,8 @@ class Simulation:
         for car_id in car_list:
             lane_pos = traci.vehicle.getLanePosition(car_id)
             lane_id = traci.vehicle.getLaneID(car_id)
-            lane_pos = 750 - lane_pos  # inversion of lane pos, so if the car is close to the traffic light -> lane_pos = 0 --- 750 = max len of a road
+            lane_length = traci.lane.getLength(lane_id)
+            lane_pos = lane_length - lane_pos  # inversion of lane pos, so if the car is close to the traffic light -> lane_pos = 0 --- 750 = max len of a road
 
             # distance in meters from the traffic light -> mapping into cells
             if lane_pos < 7:
@@ -222,11 +223,34 @@ class Simulation:
                 lane_cell = 7
             elif lane_pos < 400:
                 lane_cell = 8
-            elif lane_pos <= 750:
+            elif lane_pos <= lane_length:
                 lane_cell = 9
 
+            # for 3 lanes
             # finding the lane where the car is located 
-            # x2TL_3 are the "turn left only" lanes
+            # x2TL_2 are the "turn right only" lanes
+            # if lane_id == "W2TL_0" or lane_id == "W2TL_1":
+            #     lane_group = 0
+            # elif lane_id == "W2TL_2":
+            #     lane_group = 1
+            # elif lane_id == "N2TL_0" or lane_id == "N2TL_1":
+            #     lane_group = 2
+            # elif lane_id == "N2TL_2":
+            #     lane_group = 3
+            # elif lane_id == "E2TL_0" or lane_id == "E2TL_1":
+            #     lane_group = 4
+            # elif lane_id == "E2TL_2":
+            #     lane_group = 5
+            # elif lane_id == "S2TL_0" or lane_id == "S2TL_1":
+            #     lane_group = 6
+            # elif lane_id == "S2TL_2":
+            #     lane_group = 7
+            # else:
+            #     lane_group = -1
+
+            # for 4 lanes
+            # # finding the lane where the car is located 
+            # # x2TL_3 are the "turn right only" lanes
             if lane_id == "W2TL_0" or lane_id == "W2TL_1" or lane_id == "W2TL_2":
                 lane_group = 0
             elif lane_id == "W2TL_3":
@@ -240,6 +264,28 @@ class Simulation:
             elif lane_id == "E2TL_3":
                 lane_group = 5
             elif lane_id == "S2TL_0" or lane_id == "S2TL_1" or lane_id == "S2TL_2":
+                lane_group = 6
+            elif lane_id == "S2TL_3":
+                lane_group = 7
+            else:
+                lane_group = -1
+
+            # for 4 leanes with left green
+            # finding the lane where the car is located 
+            # # x2TL_3 are the "turn right only" lanes
+            if lane_id ==  lane_id == "W2TL_1" or lane_id == "W2TL_2":
+                lane_group = 0
+            elif lane_id == "W2TL_3":
+                lane_group = 1
+            elif lane_id ==  lane_id == "N2TL_1" or lane_id == "N2TL_2":
+                lane_group = 2
+            elif lane_id == "N2TL_3":
+                lane_group = 3
+            elif lane_id ==  lane_id == "E2TL_1" or lane_id == "E2TL_2":
+                lane_group = 4
+            elif lane_id == "E2TL_3":
+                lane_group = 5
+            elif lane_id ==  lane_id == "S2TL_1" or lane_id == "S2TL_2":
                 lane_group = 6
             elif lane_id == "S2TL_3":
                 lane_group = 7
