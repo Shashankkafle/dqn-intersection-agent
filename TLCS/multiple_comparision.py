@@ -18,19 +18,20 @@ if __name__ == "__main__":
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
     OUTPUT_TRIPS_FILE = os.getenv("OUTPUT_TRIPS_FILE")
     NET_FILE = os.getenv("NET_FILE")
-
+    print("\n\n\n\n\n\n\nconfig['n_cars_generated'] in comparision:", config['n_cars_generated'])
     TrafficGen = UniversalTrafficGenerator(
         NET_FILE,
         OUTPUT_TRIPS_FILE,
         sim_end=config['max_steps'],
         vehicle_count= config['n_cars_generated'] 
         )
-    model_number_list = [6,7,8,9,10,11,12,14,15,18,19,20,21,22,24]  # List of model numbers to evaluate
+    # List of model numbers to evaluate
+    model_number_list = [131] 
     for model_number in model_number_list:
         print(f"Evaluating model number: {model_number}")
         model_path, plot_path, comaprision_path = set_test_path(config['models_path_name'], model_number)
         model_config = import_train_configuration(config_file=model_path+'/training_settings.ini')
-        print(f"Model configuration: {model_config}")
+        # print(f"Model configuration: {model_config}")
         config['green_duration'] = model_config['green_duration']
         config['yellow_duration'] = model_config['yellow_duration']
         config['clearence_interval'] = model_config['clearence_interval']
@@ -43,13 +44,13 @@ if __name__ == "__main__":
         model_path=model_path
         )
         print("starting comparision for model:",model_number)
-
+        print("config values:  \n",config)
     
         visualization = Visualization(
        comaprision_path, 
         dpi=96
         )
-        test_ep_count = 3
+        test_ep_count = 10
         cum_avg_wait = 0
         cum_avg_queue_length = 0
         for i in range(test_ep_count):
@@ -84,11 +85,13 @@ if __name__ == "__main__":
             )
 
             print('\n----- Test episode')
+            print("Model simulation starting...")
             simulation_time = Model_Simulation.run(config['episode_seed'])  # run the simulation
+            print("cyclic simulation starting...")
             simulation_time = Cyclic_Simulation.run(config['episode_seed'])  # run the simulation
             print('Simulation time:', simulation_time, 's')
-            print('Model - Total cumulative wait time:', Model_Simulation._cum_wait_time_per_vehicle, 's')
-            print('Fixed Time - Total cumulative wait time:', Cyclic_Simulation.cum_wait_time_per_vehicle, 's')
+            # print('Model - Total cumulative wait time:', Model_Simulation._cum_wait_time_per_vehicle, 's')
+            # print('Fixed Time - Total cumulative wait time:', Cyclic_Simulation.cum_wait_time_per_vehicle, 's')
             episode_stats = {}
             episode_stats['model_total_wait'] = sum(Model_Simulation.cum_wait_time_per_vehicle.values())
             episode_stats['fixed_time_total_wait'] = sum(Cyclic_Simulation.cum_wait_time_per_vehicle.values())
@@ -97,6 +100,7 @@ if __name__ == "__main__":
             episode_stats['fixed_time_avg_wait'] = episode_stats['fixed_time_total_wait'] / config['n_cars_generated']
             episode_stats['n_cars_generated'] = config['n_cars_generated']
             # print("----- Testing info saved at:", plot_path)
+            print("episode_stats:", episode_stats)
 
             # copyfile(src='testing_settings.ini', dst=os.path.join(plot_path, 'testing_settings.ini'))
 
@@ -128,8 +132,18 @@ if __name__ == "__main__":
                 foldername=f'test_episode{i}'
             )
             visualization.save_data(
-                data=Model_Simulation.cum_wait_time_per_vehicle,
+                data=Cyclic_Simulation.cum_wait_time_per_vehicle,
                 filename='cum_wait_time_per_vehicle_fixed_time',
+                foldername=f'test_episode{i}'
+            )
+            visualization.save_data(
+                data=Model_Simulation.phase_change_sequence,
+                filename='phase_change_sequence_dqn',
+                foldername=f'test_episode{i}'
+            )
+            visualization.save_data(
+                data=Cyclic_Simulation.phase_change_sequence,
+                filename='phase_change_sequence_fixed_time',
                 foldername=f'test_episode{i}'
             )
             visualization.save_data(
