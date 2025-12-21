@@ -55,7 +55,8 @@ class Simulation:
         self._avg_wait_episode = []
         self._cum_wait_time_per_vehicle = {}
         self._phase_change_sequence = []
-        self._queue_length_episode = []
+        self._total_queue_length_episode = []
+        self._queue_length_episode_by_direction = {"west": [], "north": [], "south": [], "east": []}
         self._fixed_time = fixed_time  # Flag to indicate if fixed time simulation is used
         self._durations = durations  # Dictionary to hold fixed durations for each action if provided
 
@@ -135,8 +136,12 @@ class Simulation:
             traci.simulationStep()  # simulate 1 step in sumo
             self._step += 1 # update the step counter
             steps_todo -= 1
-            queue_length = self._get_queue_length() 
-            self._queue_length_episode.append(queue_length)
+            queue_length, halt_E, halt_W, halt_N, halt_S = self._get_queue_length() 
+            self._total_queue_length_episode.append(queue_length)
+            self._queue_length_episode_by_direction["east"].append(halt_E)
+            self._queue_length_episode_by_direction["west"].append(halt_W)
+            self._queue_length_episode_by_direction["north"].append(halt_N)
+            self._queue_length_episode_by_direction["south"].append(halt_S)
             self._collect_cum_waiting_time()
 
     def _collect_cum_waiting_time(self):
@@ -219,7 +224,7 @@ class Simulation:
         halt_E = traci.edge.getLastStepHaltingNumber("E2TL")
         halt_W = traci.edge.getLastStepHaltingNumber("W2TL")
         queue_length = halt_N + halt_S + halt_E + halt_W
-        return queue_length
+        return queue_length, halt_E, halt_W, halt_N, halt_S
 
 
     def _get_state(self):
@@ -332,8 +337,12 @@ class Simulation:
 
 
     @property
-    def queue_length_episode(self):
-        return self._queue_length_episode
+    def total_queue_length_episode(self):
+        return self._total_queue_length_episode
+
+    @property
+    def _queue_length_episode_by_direction(self):
+        return self._queue_length_episode_by_direction
 
 
     @property

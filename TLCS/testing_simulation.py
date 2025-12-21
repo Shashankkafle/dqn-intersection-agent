@@ -27,7 +27,7 @@ class Simulation:
         self._num_states = num_states
         self._num_actions = num_actions
         self._reward_episode = []
-        self._queue_length_episode = []
+        self._total_queue_length_episode = []
 
 
     def run(self, episode):
@@ -94,7 +94,7 @@ class Simulation:
             self._step += 1 # update the step counter
             steps_todo -= 1
             queue_length = self._get_queue_length() 
-            self._queue_length_episode.append(queue_length)
+            self._total_queue_length_episode.append(queue_length)
 
 
     def _collect_waiting_times(self):
@@ -229,8 +229,8 @@ class Simulation:
 
 
     @property
-    def queue_length_episode(self):
-        return self._queue_length_episode
+    def total_queue_length_episode(self):
+        return self._total_queue_length_episode
 
 
     @property

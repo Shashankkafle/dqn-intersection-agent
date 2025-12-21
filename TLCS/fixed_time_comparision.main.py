@@ -89,10 +89,10 @@ if __name__ == "__main__":
         copyfile(src='testing_settings.ini', dst=os.path.join(plot_path, 'testing_settings.ini'))
 
         visualization.save_data(foldername=f'test_episode{i}',data=Model_Simulation.reward_episode, filename='model_reward', )
-        visualization.save_data(foldername=f'test_episode{i}',data=Model_Simulation.queue_length_episode, filename='model_queue')
+        visualization.save_data(foldername=f'test_episode{i}',data=Model_Simulation.total_queue_length_episode, filename='model_queue')
         visualization.save_data(foldername=f'test_episode{i}',data=Model_Simulation.avg_wait_episode, filename='model_average_wait')
         visualization.save_data(foldername=f'test_episode{i}',data=Cyclic_Simulation.reward_episode, filename='fixed_time_reward', )
-        visualization.save_data(foldername=f'test_episode{i}',data=Cyclic_Simulation.queue_length_episode, filename='tixed_time_queue')
+        visualization.save_data(foldername=f'test_episode{i}',data=Cyclic_Simulation.total_queue_length_episode, filename='tixed_time_queue')
         visualization.save_data(foldername=f'test_episode{i}',data=Cyclic_Simulation.avg_wait_episode, filename='tixed_time_average_wait')
     
         visualization.save_data(
@@ -126,8 +126,8 @@ if __name__ == "__main__":
             foldername=f'test_episode{i}'
         )
         visualization.overlayed_plot(
-            fixed_time_data=Cyclic_Simulation.queue_length_episode,
-            model_data=Model_Simulation.queue_length_episode,
+            fixed_time_data=Cyclic_Simulation.total_queue_length_episode,
+            model_data=Model_Simulation.total_queue_length_episode,
             filename='queue_length_comparison',
             xlabel='Step', 
             ylabel='Queue length (vehicles)',
