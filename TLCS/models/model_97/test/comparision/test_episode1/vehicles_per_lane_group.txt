@@ -1,0 +1,1 @@
+{'route_E2TL_TL2W': 393, 'route_W2TL_TL2E': 407, 'route_N2TL_TL2E': 129, 'route_N2TL_TL2W': 118, 'route_N2TL_TL2S': 405, 'route_S2TL_TL2N': 418, 'route_E2TL_TL2S': 122, 'route_E2TL_TL2N': 155, 'route_S2TL_TL2W': 125, 'route_W2TL_TL2N': 126, 'route_S2TL_TL2E': 160, 'route_W2TL_TL2S': 142}

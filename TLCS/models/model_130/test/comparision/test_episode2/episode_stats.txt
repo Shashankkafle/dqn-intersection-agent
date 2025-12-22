@@ -1,0 +1,1 @@
+{'model_total_wait': 99299.0, 'fixed_time_total_wait': 664865.0, 'model_avg_wait': 66.19933333333333, 'fixed_time_avg_wait': 443.24333333333334, 'n_cars_generated': 1500}
