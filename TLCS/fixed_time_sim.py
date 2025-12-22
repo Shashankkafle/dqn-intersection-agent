@@ -340,9 +340,9 @@ class Simulation:
     def total_queue_length_episode(self):
         return self._total_queue_length_episode
 
-    @property
-    def _queue_length_episode_by_direction(self):
-        return self._queue_length_episode_by_direction
+    # @property
+    # def _queue_length_episode_by_direction(self):
+    #     return self._queue_length_episode_by_direction
 
 
     @property
