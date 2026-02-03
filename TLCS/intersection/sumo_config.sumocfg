@@ -3,7 +3,7 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
-        <net-file value="four_lane_left_green.net.xml"/>
+        <net-file value="nstda.net.xml"/>
         <route-files value="episode_routes.rou.xml"/>
     </input>
 

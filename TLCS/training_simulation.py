@@ -5,14 +5,13 @@ import timeit
 import os
 
 # phase codes based on environment.net.xml
-PHASE_NS_GREEN = 0  # action 0 code 00
-PHASE_NS_YELLOW = 1
-PHASE_NSL_GREEN = 2  # action 1 code 01
-PHASE_NSL_YELLOW = 3
-PHASE_EW_GREEN = 4  # action 2 code 10
-PHASE_EW_YELLOW = 5
-PHASE_EWL_GREEN = 6  # action 3 code 11
-PHASE_EWL_YELLOW = 7
+PHASE_1_GREEN = 0  # action 0 code 00
+PHASE_1_YELLOW = 1
+PHASE_2_GREEN = 2  # action 1 code 01
+PHASE_2_YELLOW = 3
+PHASE_3_GREEN = 4  # action 2 code 10
+PHASE_3_YELLOW = 5
+
 
 
 class Simulation:
@@ -60,7 +59,8 @@ class Simulation:
 
             # get current state of the intersection
             current_state = self._get_state()
-
+            print("step:", self._step)
+            print("state:", current_state)
             # calculate reward of previous action: (change in cumulative waiting time between actions)
             # waiting time = seconds waited by a car since the spawn in the environment, cumulated for every car in incoming lanes
             current_total_wait = self._collect_waiting_times()
@@ -127,7 +127,7 @@ class Simulation:
         """
         Retrieve the waiting time of every car in the incoming roads
         """
-        incoming_roads = ["E2TL", "N2TL", "W2TL", "S2TL"]
+        incoming_roads = ["E2TL", "W2TL", "S2TL"]
         car_list = traci.vehicle.getIDList()
         for car_id in car_list:
             wait_time = traci.vehicle.getAccumulatedWaitingTime(car_id)
@@ -162,7 +162,7 @@ class Simulation:
         """
         Activate the correct yellow light combination in sumo
         """
-        clearence_phase_code = 8 # CAUTION: make sure this matches the network file
+        clearence_phase_code = 6 # CAUTION: make sure this matches the network file
         traci.trafficlight.setPhase("TL", clearence_phase_code)
 
     def _set_green_phase(self, action_number):
@@ -170,24 +170,23 @@ class Simulation:
         Activate the correct green light combination in sumo
         """
         if action_number == 0:
-            traci.trafficlight.setPhase("TL", PHASE_NS_GREEN)
+            traci.trafficlight.setPhase("TL", PHASE_1_GREEN)
         elif action_number == 1:
-            traci.trafficlight.setPhase("TL", PHASE_NSL_GREEN)
+            traci.trafficlight.setPhase("TL", PHASE_2_GREEN)
         elif action_number == 2:
-            traci.trafficlight.setPhase("TL", PHASE_EW_GREEN)
-        elif action_number == 3:
-            traci.trafficlight.setPhase("TL", PHASE_EWL_GREEN)
+            traci.trafficlight.setPhase("TL", PHASE_3_GREEN)
+        else:
+            raise Exception("Error: action number not recognized")
 
 
     def _get_queue_length(self):
         """
         Retrieve the number of cars with speed = 0 in every incoming lane
         """
-        halt_N = traci.edge.getLastStepHaltingNumber("N2TL")
         halt_S = traci.edge.getLastStepHaltingNumber("S2TL")
         halt_E = traci.edge.getLastStepHaltingNumber("E2TL")
         halt_W = traci.edge.getLastStepHaltingNumber("W2TL")
-        queue_length = halt_N + halt_S + halt_E + halt_W
+        queue_length =   halt_S + halt_E + halt_W
         return queue_length
 
 
@@ -205,94 +204,39 @@ class Simulation:
             lane_pos = lane_length - lane_pos  # inversion of lane pos, so if the car is close to the traffic light -> lane_pos = 0 --- 750 = max len of a road
 
             # distance in meters from the traffic light -> mapping into cells
-            if lane_pos < 7:
+            if lane_pos < 5:
                 lane_cell = 0
-            elif lane_pos < 14:
+            elif lane_pos < 10:
                 lane_cell = 1
-            elif lane_pos < 21:
+            elif lane_pos < 15:
                 lane_cell = 2
-            elif lane_pos < 28:
+            elif lane_pos < 20:
                 lane_cell = 3
-            elif lane_pos < 40:
+            elif lane_pos < 25:
                 lane_cell = 4
-            elif lane_pos < 60:
+            elif lane_pos < 30:
                 lane_cell = 5
-            elif lane_pos < 100:
+            elif lane_pos < 35:
                 lane_cell = 6
-            elif lane_pos < 160:
+            elif lane_pos <= 40:
                 lane_cell = 7
-            elif lane_pos < 400:
+            elif lane_pos <= 45:
                 lane_cell = 8
             elif lane_pos <= lane_length:
                 lane_cell = 9
 
-            # for 3 lanes
-            # finding the lane where the car is located 
-            # x2TL_2 are the "turn right only" lanes
-            # if lane_id == "W2TL_0" or lane_id == "W2TL_1":
-            #     lane_group = 0
-            # elif lane_id == "W2TL_2":
-            #     lane_group = 1
-            # elif lane_id == "N2TL_0" or lane_id == "N2TL_1":
-            #     lane_group = 2
-            # elif lane_id == "N2TL_2":
-            #     lane_group = 3
-            # elif lane_id == "E2TL_0" or lane_id == "E2TL_1":
-            #     lane_group = 4
-            # elif lane_id == "E2TL_2":
-            #     lane_group = 5
-            # elif lane_id == "S2TL_0" or lane_id == "S2TL_1":
-            #     lane_group = 6
-            # elif lane_id == "S2TL_2":
-            #     lane_group = 7
-            # else:
-            #     lane_group = -1
-
-            # for 4 lanes
-            # # finding the lane where the car is located 
-            # # x2TL_3 are the "turn right only" lanes
-            if lane_id == "W2TL_0" or lane_id == "W2TL_1" or lane_id == "W2TL_2":
-                lane_group = 0
-            elif lane_id == "W2TL_3":
-                lane_group = 1
-            elif lane_id == "N2TL_0" or lane_id == "N2TL_1" or lane_id == "N2TL_2":
-                lane_group = 2
-            elif lane_id == "N2TL_3":
-                lane_group = 3
-            elif lane_id == "E2TL_0" or lane_id == "E2TL_1" or lane_id == "E2TL_2":
-                lane_group = 4
-            elif lane_id == "E2TL_3":
-                lane_group = 5
-            elif lane_id == "S2TL_0" or lane_id == "S2TL_1" or lane_id == "S2TL_2":
-                lane_group = 6
-            elif lane_id == "S2TL_3":
-                lane_group = 7
-            else:
-                lane_group = -1
-
             # for 4 leanes with left green
             # finding the lane where the car is located 
-            # # x2TL_3 are the "turn right only" lanes
-            if lane_id ==  lane_id == "W2TL_1" or lane_id == "W2TL_2":
+            if lane_id ==  lane_id == "W2TL_1" or lane_id == "W2TL_0":
                 lane_group = 0
-            elif lane_id == "W2TL_3":
+            elif lane_id == "S2TL_0":
                 lane_group = 1
-            elif lane_id ==  lane_id == "N2TL_1" or lane_id == "N2TL_2":
+            elif lane_id ==  lane_id == "E2TL_1" or lane_id == "E2TL_0":
                 lane_group = 2
-            elif lane_id == "N2TL_3":
-                lane_group = 3
-            elif lane_id ==  lane_id == "E2TL_1" or lane_id == "E2TL_2":
-                lane_group = 4
-            elif lane_id == "E2TL_3":
-                lane_group = 5
-            elif lane_id ==  lane_id == "S2TL_1" or lane_id == "S2TL_2":
-                lane_group = 6
-            elif lane_id == "S2TL_3":
-                lane_group = 7
             else:
                 lane_group = -1
 
-            if lane_group >= 1 and lane_group <= 7:
+            if lane_group >= 1 and lane_group <= 2:
                 car_position = int(str(lane_group) + str(lane_cell))  # composition of the two postion ID to create a number in interval 0-79
                 valid_car = True
             elif lane_group == 0:
