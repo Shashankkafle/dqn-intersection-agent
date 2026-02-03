@@ -222,7 +222,7 @@ class Simulation:
                 lane_cell = 7
             elif lane_pos <= 45:
                 lane_cell = 8
-            elif lane_pos <= lane_length:
+            elif lane_pos <= 50:
                 lane_cell = 9
 
             # for 4 leanes with left green
