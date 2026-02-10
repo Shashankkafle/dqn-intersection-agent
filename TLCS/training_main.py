@@ -99,7 +99,6 @@ if __name__ == "__main__":
     print("----- Session info saved at:", path)
 
     Model.save_model(path)
-
     copyfile(src='training_settings.ini', dst=os.path.join(path, 'training_settings.ini'))
 
     visualization.save_data_and_plot(data=Simulation.reward_store, filename='reward', xlabel='Episode', ylabel='Cumulative negative reward')
