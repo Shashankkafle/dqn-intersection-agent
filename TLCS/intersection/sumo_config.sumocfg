@@ -4,7 +4,7 @@
 
     <input>
         <net-file value="NSTDA.net.xml"/>
-        <route-files value="episode_routes.rou.xml"/>
+        <route-files value="test_route.rou.xml"/>
     </input>
 
     <time>
