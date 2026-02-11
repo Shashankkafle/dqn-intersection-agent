@@ -26,7 +26,7 @@ if __name__ == "__main__":
         config['width_layers'], 
         config['batch_size'], 
         config['learning_rate'], 
-        input_dim=config['num_states'], 
+        input_dim= config['state_max_lane_length'] // config['state_block_size'] * config['num_state_lane_groups'], 
         output_dim=config['num_actions']
     )
 
@@ -42,7 +42,6 @@ if __name__ == "__main__":
     flow_rate = config['n_cars_generated'] / config['max_steps']
     NET_FILE = os.getenv("NET_FILE")
     OUTPUT_TRIPS_FILE = os.getenv("OUTPUT_TRIPS_FILE")
-
 
     TrafficGen = UniversalTrafficGenerator(
         NET_FILE,
@@ -66,11 +65,14 @@ if __name__ == "__main__":
         config['green_duration'],
         config['yellow_duration'],
         config['clearence_interval'],
-        config['num_states'],
+        config['state_max_lane_length'],
+        config['state_block_size'],
         config['num_actions'],
-        config['training_epochs']
+        config['training_epochs'],
+
     )
-    
+
+
     episode = 0
     timestamp_start = datetime.datetime.now()
     

@@ -1,7 +1,7 @@
 import numpy as np
 
 class State:
-    def __init__(self, traci, max_lane_length=150, block_size=5, num_lane_groups=3, group_mapping={
+    def __init__(self, traci, max_lane_length=150, block_size=5, group_mapping={
             "W2TL_1": 0, "W2TL_0": 0,
             "S2TL_0": 1,
             "E2TL_1": 2, "E2TL_0": 2
@@ -9,7 +9,7 @@ class State:
         self._traci = traci
         self._block_size = block_size
         self._max_lane_length = max_lane_length
-        self._num_lane_groups = num_lane_groups
+        self._num_lane_groups = len(set(group_mapping.values()))
         
         # Fixed size for NN input: (150/5) * 3 = 90 elements
         self._cells_per_group = self._max_lane_length // self._block_size
@@ -53,7 +53,6 @@ class State:
                     
                     # CORRECT FLAT INDEXING: (Group * 30) + Cell
                     state_idx = (lane_group * self._cells_per_group) + lane_cell
-                    print(f"\n\n\nCar {car_id} on lane {lane_id} (group {lane_group}) at pos {dist_to_tl} contributes to state index {state_idx}.")
                     
                     if state_idx < self.num_states:
                         state[state_idx] = normalized_pos

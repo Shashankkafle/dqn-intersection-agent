@@ -25,7 +25,9 @@ def import_train_configuration(config_file):
     config['training_epochs'] = content['model'].getint('training_epochs')
     config['memory_size_min'] = content['memory'].getint('memory_size_min')
     config['memory_size_max'] = content['memory'].getint('memory_size_max')
-    config['num_states'] = content['agent'].getint('num_states')
+    config['state_max_lane_length'] = content['agent'].getint('state_max_lane_length')
+    config['num_state_lane_groups'] = content['agent'].getint('num_state_lane_groups')
+    config['state_block_size'] = content['agent'].getint('state_block_size')
     config['num_actions'] = content['agent'].getint('num_actions')
     config['gamma'] = content['agent'].getfloat('gamma')
     config['models_path_name'] = content['dir']['models_path_name']

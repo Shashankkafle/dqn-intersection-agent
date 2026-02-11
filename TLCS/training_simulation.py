@@ -3,7 +3,7 @@ import numpy as np
 import random
 import timeit
 import os
-
+from state import State
 # phase codes based on environment.net.xml
 PHASE_1_GREEN = 0  # action 0 code 00
 PHASE_1_YELLOW = 1
@@ -12,10 +12,14 @@ PHASE_2_YELLOW = 3
 PHASE_3_GREEN = 4  # action 2 code 10
 PHASE_3_YELLOW = 5
 
-
+group_mapping={
+            "W2TL_1": 0, "W2TL_0": 0,
+            "S2TL_0": 1,
+            "E2TL_1": 2, "E2TL_0": 2
+        }
 
 class Simulation:
-    def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, clearence_duration, num_states, num_actions, training_epochs):
+    def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, clearence_duration, max_lane_length, block_size, num_actions, training_epochs):
         self._Model = Model
         self._Memory = Memory
         self._TrafficGen = TrafficGen
@@ -26,7 +30,10 @@ class Simulation:
         self._green_duration = green_duration
         self._yellow_duration = yellow_duration
         self._clearence_duration = clearence_duration
-        self._num_states = num_states
+        self._max_lane_length = max_lane_length
+        self._block_size = block_size
+        self._num_lane_groups = len(set(group_mapping.values()))
+        self._num_states = max_lane_length // block_size * self._num_lane_groups
         self._num_actions = num_actions
         self._reward_store = []
         self._cumulative_wait_store = []
@@ -44,6 +51,7 @@ class Simulation:
         self._TrafficGen.generate_routefile(seed=episode)
         print("sumo cmd",self._sumo_cmd)
         traci.start(self._sumo_cmd)
+        state_obj = State(traci, max_lane_length=150, block_size=5, group_mapping=group_mapping)
         print("Simulating...")
 
         # inits
@@ -59,7 +67,7 @@ class Simulation:
         while self._step < self._max_steps:
 
             # get current state of the intersection
-            current_state = self._get_state()
+            current_state = state_obj.get_state()
             print("step:", self._step)
             print("state:", current_state)
             # calculate reward of previous action: (change in cumulative waiting time between actions)
@@ -81,6 +89,7 @@ class Simulation:
                 self._set_clearence_phase()
                 self._simulate(self._clearence_duration)
 
+            print(f"Action chosen: {action} (epsilon: {round(epsilon, 2)})")
             # execute the phase selected before
             self._set_green_phase(action)
             self._simulate(self._green_duration)
@@ -98,11 +107,10 @@ class Simulation:
         print("Total reward:", self._sum_neg_reward, "- Epsilon:", round(epsilon, 2))
         traci.close()
         simulation_time = round(timeit.default_timer() - start_time, 1)
-
         print("Training...")
         start_time = timeit.default_timer()
-        for _ in range(self._training_epochs):
-            self._replay()
+        # for _ in range(self._training_epochs):
+            # self._replay()
         training_time = round(timeit.default_timer() - start_time, 1)
 
         return simulation_time, training_time
@@ -147,8 +155,10 @@ class Simulation:
         Decide wheter to perform an explorative or exploitative action, according to an epsilon-greedy policy
         """
         if random.random() < epsilon:
+            print("Choosing random action",self._num_actions)
             return random.randint(0, self._num_actions - 1) # random action
         else:
+            print("Choosing models action")
             return np.argmax(self._Model.predict_one(state)) # the best action given the current state
 
 
